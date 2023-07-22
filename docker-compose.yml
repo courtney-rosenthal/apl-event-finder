@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+
+  elasticsearch:
+    # Spring Data Elasticsearch isn't ready for v8 yet
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+    environment:
+      - network.host=0.0.0.0
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - 9200:9200
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data/
+
+volumes:
+  elasticsearch_data:
+
