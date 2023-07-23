@@ -9,14 +9,14 @@ internal class RecommendedAgeTest {
 
     @Test
     fun recommendedAge() {
-        val a = RecommendedAge(Period.ofYears(13), Period.ofYears(18))
-        assertThat(a.toString()).isEqualTo("RecommendedAge(minAge=P13Y, maxAge=P18Y)")
+        val a = RecommendedAge(13, 18)
+        assertThat(a.toString()).isEqualTo("RecommendedAge(minYears=13, maxYears=18)")
 
-        val b = RecommendedAge(null, Period.ofYears(18))
-        assertThat(b.toString()).isEqualTo("RecommendedAge(minAge=null, maxAge=P18Y)")
+        val b = RecommendedAge(null, 18)
+        assertThat(b.toString()).isEqualTo("RecommendedAge(minYears=null, maxYears=18)")
 
-        val c = RecommendedAge(Period.ofYears(13), null)
-        assertThat(c.toString()).isEqualTo("RecommendedAge(minAge=P13Y, maxAge=null)")
+        val c = RecommendedAge(13, null)
+        assertThat(c.toString()).isEqualTo("RecommendedAge(minYears=13, maxYears=null)")
     }
 
 }

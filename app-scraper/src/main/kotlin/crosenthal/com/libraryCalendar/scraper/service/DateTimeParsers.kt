@@ -27,12 +27,10 @@ class DateTimeParsers {
     )
 
     internal val dateFormatters = supportedDatePatterns.flatMap { datePattern ->
-
         val formatter = DateTimeFormatterBuilder()
             .parseCaseInsensitive()
             .appendPattern(datePattern)
             .toFormatter()
-
         supportedLocales.map { locale -> formatter.withLocale(locale) }
     }
 
@@ -74,28 +72,28 @@ class DateTimeParsers {
 
         "^All ages welcome$".toRegex(CANON_EQ) to { ignored -> RecommendedAge(null, null) },
 
-        "^Teens 13-18 only$".toRegex(CANON_EQ) to { ignored -> RecommendedAge(Period.ofYears(13), Period.ofYears(18)) },
+        "^Teens 13-18 only$".toRegex(CANON_EQ) to { ignored -> RecommendedAge(13, 18) },
 
-        "^Teens and adults welcome$".toRegex(CANON_EQ) to { ignored -> RecommendedAge(Period.ofYears(13), null) },
+        "^Teens and adults welcome$".toRegex(CANON_EQ) to { ignored -> RecommendedAge(13, null) },
 
         "^Recommended for ages (\\d+)-(\\d+)$".toRegex(CANON_EQ) to fun(matches: MatchResult) : RecommendedAge {
             matches.verify(2)
-            return RecommendedAge(Period.ofYears(matches.getIntVal(1)), Period.ofYears(matches.getIntVal(2)))
+            return RecommendedAge(matches.getIntVal(1), matches.getIntVal(2))
         },
 
         "^Recommended for ages (\\d+) and up$".toRegex(CANON_EQ) to fun(matches: MatchResult) : RecommendedAge {
             matches.verify(1)
-            return RecommendedAge(Period.ofYears(matches.getIntVal(1)), null)
+            return RecommendedAge(matches.getIntVal(1), null)
         },
 
         "^Recommended for ages (\\d+) and under$".toRegex(CANON_EQ) to fun(matches: MatchResult) : RecommendedAge {
             matches.verify(1)
-            return RecommendedAge(null, Period.ofYears(matches.getIntVal(1)))
+            return RecommendedAge(null, matches.getIntVal(1))
         },
 
         "^Recommended for ages (\\d+) months to (\\d+) years$".toRegex(CANON_EQ) to fun(matches: MatchResult) : RecommendedAge {
             matches.verify(2)
-            return RecommendedAge(Period.ofMonths(matches.getIntVal(1)), Period.ofYears(matches.getIntVal(2)))
+            return RecommendedAge(Math.round(matches.getIntVal(1)/12.0).toInt(), matches.getIntVal(2))
         },
 
     )
@@ -130,6 +128,7 @@ class DateTimeParsers {
             }
             val date = parseLocalDate(dateStr)
 
+            // startTimeStr => "7:00 PM", endTimeStr => "8:00 PM"
             val (startTimeStr, endTimeStr) = let {
                 val a = timeRangeStr.split(" to ")
                 when (a.size) {
@@ -140,11 +139,10 @@ class DateTimeParsers {
                     }
                 }
             }
-            // startTimeStr => "7:00 PM", endTimeStr => "8:00 PM"
             val startTime = parseLocalTime(startTimeStr)
             val endTime = if (endTimeStr != null) parseLocalTime(endTimeStr) else null
 
-            return EventDateTime(date, startTime, endTime)
+            return EventDateTime.of(date, startTime, endTime)
         }
 
 }

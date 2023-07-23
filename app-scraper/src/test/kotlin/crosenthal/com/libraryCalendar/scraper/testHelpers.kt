@@ -27,13 +27,11 @@ object testHelpers {
         return inStream
     }
 
-    fun scrapeFromInputStream(scraper: EventScraper, inStream: InputStream, url: String) : EventScraper.ScrapeState {
-        val doc = scraper.loadDocumentFromStream(inStream, url)
-        Preconditions.notNull(doc, "failed to load document from: $url")
-        val state = scraper.scrapeToEvent(doc, url)
-        Preconditions.notNull(state, "failed to scrape event from: $url")
-        return state
-    }
+//    fun scrapeFromInputStream(scraper: EventScraper, inStream: InputStream, url: String) : Pair<CalendarEvent, ScrapeIssues> {
+//        val doc = scraper.loadDocumentFromStream(inStream, url)
+//        val result = scraper.scrapeToEvent(doc, url)
+//        return result
+//    }
 
     fun streamTestDocumentsIndex() : Stream<String> {
         return ClassLoader.getSystemResourceAsStream(TEST_PAGES_INDEX).bufferedReader().lines()

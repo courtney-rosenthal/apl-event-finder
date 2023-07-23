@@ -1,6 +1,7 @@
 package crosenthal.com.libraryCalendar.scraper.service
 
 import crosenthal.com.libraryCalendar.scraper.domain.CalendarEvent
+import crosenthal.com.libraryCalendar.scraper.domain.ScrapeIssues
 import crosenthal.com.libraryCalendar.scraper.util.getRootMessage
 import org.fissore.slf4j.FluentLoggerFactory
 import org.jsoup.Jsoup
@@ -13,6 +14,9 @@ import java.io.InputStream
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 
+/**
+ * Scrape a web page that contains a single event.
+ */
 @Service
 class EventScraper(
     val dateTimeParsers: DateTimeParsers
@@ -29,23 +33,6 @@ class EventScraper(
     // general scraping helpers
     // ======================================================================
 
-    data class ScrapeIssue(
-        val message: String,
-        val resolution: String,
-        val node: Node,
-        val selector: String? = getBriefSelector(node),
-    )
-
-    class ScrapeState(url: String, eventSource: Element) {
-
-        val event = CalendarEvent(url, eventSource.html())
-
-        val issues = mutableListOf<ScrapeIssue>()
-
-        val processedElements = mutableSetOf<String>()
-
-    }
-
 
     fun Node.removeChildrenByTag(removeTags: List<String> = emptyList()): List<Node> {
         return this.childNodes().filterNot {
@@ -53,37 +40,45 @@ class EventScraper(
         }
     }
 
-    fun Node.gatherChildren(): List<TextNode> {
-        return this.childNodes().gatherChildren()
+    fun Node.collectText(): List<String> {
+        return this.childNodes().collectText()
     }
 
-    fun List<Node>.gatherChildren() : List<TextNode> {
+    fun List<Node>.collectText(): List<String> {
         return this.flatMap {
             when (it) {
-                is Element -> it.gatherChildren()
-                is TextNode -> listOf(it)
+                is Element -> it.collectText()
+                is TextNode -> listOf(it.text())
                 else -> throw IllegalStateException("unexpected node type: ${it}")
             }
-        }.filterNot { it.isBlank }
+        }.map { it.trim() }.filter { it.isNotBlank() }
     }
 
-    fun Node.singleTextNode(node: Node, state: ScrapeState): String? {
-        return this.gatherChildren().singleTextNode(node, state)
+
+    fun List<String>.collate(): String? {
+        return if (this.size > 0) this.joinToString("\n") else null
+
     }
 
-    fun List<TextNode>.singleTextNode(node: Node, state: ScrapeState) : String? {
+    fun Node.singleTextNode(node: Node, issues: ScrapeIssues, isOptional: Boolean = false): String? {
+        return this.collectText().singleTextNode(node, issues, isOptional)
+    }
+
+    fun List<String>.singleTextNode(node: Node, issues: ScrapeIssues, isOptional: Boolean = false) : String? {
         val n = this.size
         when (n) {
             0 -> {
-                state.issues.add(ScrapeIssue("no text children found", "dropped", node))
+                if (! isOptional) {
+                    issues.add("no text children found", "dropped", node)
+                }
                 return null
             }
             1 -> {}
             else -> {
-                state.issues.add(ScrapeIssue("has too many text children (expected 1, got $n", "ignored extra", node))
+                issues.add("has too many text children (expected 1, got $n", "ignored extra", node)
             }
         }
-        return this.first().text()
+        return this.first()
     }
 
 
@@ -91,49 +86,43 @@ class EventScraper(
     // field-specific scraping
     // ======================================================================
 
-    internal fun extractLocation(element: Element, state: ScrapeState): String? {
+    internal fun extractLocation(element: Element, issues: ScrapeIssues): String? {
         // TODO: fully implement location
-        val txt = element.gatherChildren().map { it.text() }.joinToString("\n")
-        return if (txt.isBlank()) {
-            state.issues.add(ScrapeIssue("cannot extract location", "skipped", element))
-            null
-        } else {
-            txt
-        }
+       return element.collectText().collate()
     }
 
-    internal fun extractRegistration(element: Element, state: ScrapeState): String? {
+    internal fun extractRegistration(element: Element, issues: ScrapeIssues): String? {
         val links = element.select("a").toList()
         when (links.size) {
             0 -> {
-                state.issues.add(ScrapeIssue("failed to find registration link", "skipped", element))
+                issues.add("failed to find registration link", "skipped", element)
             }
             1 -> {}
             else -> {
-                state.issues.add(ScrapeIssue("too manyregistration links foundk", "excess dropped", element))
+                issues.add("too manyregistration links foundk", "excess dropped", element)
             }
         }
         return links.firstOrNull()?.attr("href")
     }
 
 
-    internal fun extractIsFree(element: Element, state: ScrapeState): Boolean? {
-        val txt = element.singleTextNode(element, state)
+    internal fun extractIsFree(element: Element, issues: ScrapeIssues): Boolean? {
+        val txt = element.singleTextNode(element, issues)
         return when (txt) {
             null -> null
             "Free and open to the public | Gratis y abierto al público" -> true
             else -> {
-                state.issues.add(ScrapeIssue("unknown event cost", "ignored", element))
+                issues.add("unknown event cost", "ignored", element)
                 null
             }
         }
     }
 
 
-    internal fun extractTags(element: Element, state: ScrapeState): List<String> {
+    internal fun extractTags(element: Element, issues: ScrapeIssues): List<String> {
         return element.childNodes()
             .filter { it is Element && it.tagName() == "a" }
-            .map { it.singleTextNode(element, state) }
+            .map { it.singleTextNode(element, issues) }
             .filterNotNull()
     }
 
@@ -153,62 +142,63 @@ class EventScraper(
     }
 
 
-    private val fieldHandlers = mapOf<String, (Element, ScrapeState) -> Unit>(
+    private val fieldHandlers = mapOf<String, (Element, CalendarEvent, ScrapeIssues) -> Unit>(
 
-        "div.field-title" to { element: Element, state: ScrapeState ->
-            state.event.title = element.singleTextNode(element, state)
+        "div.field-title" to { element: Element, event: CalendarEvent, issues: ScrapeIssues ->
+            event.title = element.singleTextNode(element, issues)
         },
 
-        "div.event_subtitle" to  { element: Element, state: ScrapeState ->
-            state.event.subTitle = element.singleTextNode(element, state)
+        "div.event_subtitle" to  { element: Element, event: CalendarEvent, issues: ScrapeIssues ->
+            event.subTitle = element.singleTextNode(element, issues, isOptional = true)
         },
 
-        "div.apl-event-summary" to  { element: Element, state: ScrapeState ->
-            state.event.summary = element.singleTextNode(element, state)
+        "div.apl-event-summary" to  { element: Element, event: CalendarEvent, issues: ScrapeIssues ->
+            event.summary = element.collectText().collate()
         },
 
-        "div.apl-rec-age" to  { element: Element, state: ScrapeState ->
-            val txt = element.singleTextNode(element, state)
+        "div.apl-rec-age" to  { element: Element, event: CalendarEvent, issues: ScrapeIssues ->
+            val txt = element.singleTextNode(element, issues)
             if (txt != null) {
                 try {
-                    state.event.recommendedAge = dateTimeParsers.parseRecommendedAge(txt)
+                    event.recommendedAge = dateTimeParsers.parseRecommendedAge(txt)
                 } catch (ex: IllegalArgumentException) {
-                    state.issues.add(ScrapeIssue(ex.getRootMessage(), "dropped", element))
+                    issues.add(ex.getRootMessage(), "dropped", element)
                 }
             }
         },
 
-        "div.field-event-time" to  { element: Element, state: ScrapeState ->
-            val txt = element.removeChildrenByTag(listOf("i")).gatherChildren().singleTextNode(element, state)
+        "div.field-event-time" to  { element: Element, event: CalendarEvent, issues: ScrapeIssues ->
+            val txt = element.removeChildrenByTag(listOf("i")).collectText().singleTextNode(element, issues)
             if (txt != null) {
                 try {
-                    state.event.time = dateTimeParsers.parseEventDateTime(txt)
+                    event.time = dateTimeParsers.parseEventDateTime(txt)
                 } catch (ex: IllegalArgumentException) {
-                    state.issues.add(ScrapeIssue(ex.getRootMessage(), "dropped", element))
+                    issues.add(ex.getRootMessage(), "dropped", element)
                 }
             }
         },
 
-        "div.field-event-loc" to  { element: Element, state: ScrapeState ->
-            state.event.location = extractLocation(element, state)
+        "div.field-event-loc" to  { element: Element, event: CalendarEvent, issues: ScrapeIssues ->
+            event.location = extractLocation(element, issues)
         },
 
-        "div.field-event-reg" to  { element: Element, state: ScrapeState ->
-            state.event.registration = extractRegistration(element, state)
+        "div.field-event-reg" to  { element: Element, event: CalendarEvent, issues: ScrapeIssues ->
+            event.registrationUrl = extractRegistration(element, issues)
         },
 
-        "div.apl-free" to  { element: Element, state: ScrapeState ->
-            state.event.isFree = extractIsFree(element, state)
+        "div.apl-free" to  { element: Element, event: CalendarEvent, issues: ScrapeIssues ->
+            event.isFree = extractIsFree(element, issues)
         },
 
-        "div.apl-event-tags" to  { element: Element, state: ScrapeState ->
-            state.event.tags = extractTags(element, state)
+        "div.apl-event-tags" to  { element: Element, event: CalendarEvent, issues: ScrapeIssues ->
+            event.tags = extractTags(element, issues)
         },
 
     ) // end of fieldHandlers
 
 
-    fun scrapeToEvent(doc: Document, url: String) : ScrapeState {
+    fun scrapeToEvent(doc: Document, url: String) : Pair<CalendarEvent, ScrapeIssues> {
+
 
         val eventSource = let {
             val a = doc.select("div.apl-event")
@@ -218,7 +208,11 @@ class EventScraper(
             a.first()!!
         }
 
-        val state = ScrapeState(url, eventSource)
+        val event = CalendarEvent(url, eventSource.html())
+
+        val issues = ScrapeIssues()
+
+        val processedElements = mutableSetOf<String>()
 
         val unusedNodes = mutableListOf<Node>()
         for (node in eventSource.childNodes()) {
@@ -233,8 +227,8 @@ class EventScraper(
             }
 
             val selector = getBriefSelector(node)!!
-            if (state.processedElements.contains(selector)) {
-                state.issues.add(ScrapeIssue("encountered duplicate element", "dropped", node))
+            if (processedElements.contains(selector)) {
+                issues.add("encountered duplicate element", "dropped", node)
                 continue
             }
 
@@ -245,15 +239,21 @@ class EventScraper(
                 continue
             }
 
-            handler(node, state)
+            handler(node, event, issues)
         }
 
         // Throw whatever was not consumed into the description.
-        state.event.description = unusedNodes.map {it.outerHtml()}.joinToString("\n")
+        event.description = unusedNodes.map {it.outerHtml()}.joinToString("\n")
+
+        try {
+            event.checkRequiredFields()
+        } catch (ex: IllegalStateException) {
+            issues.add(ex.getRootMessage(), "ignored", null)
+        }
 
         // TODO - check for missing fields
 
-        return state
+        return Pair(event, issues)
     }
 
 }

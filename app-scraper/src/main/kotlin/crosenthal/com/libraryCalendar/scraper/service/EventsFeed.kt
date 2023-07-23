@@ -7,12 +7,14 @@ import org.fissore.slf4j.FluentLoggerFactory
 import org.springframework.stereotype.Service
 import java.net.URL
 
+/**
+ * Process the RSS feed of events.
+ */
 @Service
 class EventsFeed() {
 
     companion object {
         val LOG = FluentLoggerFactory.getLogger(EventsFeed::class.java)
-
     }
 
 
