@@ -70,11 +70,11 @@ class DateTimeParsers {
 
     internal val recommendedAgePatterns = listOf(
 
-        "^All ages welcome$".toRegex(CANON_EQ) to { ignored -> RecommendedAge(null, null) },
+        "^All ages welcome$".toRegex(CANON_EQ) to { _ -> RecommendedAge(null, null) },
 
-        "^Teens 13-18 only$".toRegex(CANON_EQ) to { ignored -> RecommendedAge(13, 18) },
+        "^Teens 13-18 only$".toRegex(CANON_EQ) to { _ -> RecommendedAge(13, 18) },
 
-        "^Teens and adults welcome$".toRegex(CANON_EQ) to { ignored -> RecommendedAge(13, null) },
+        "^Teens and adults welcome$".toRegex(CANON_EQ) to { _ -> RecommendedAge(13, null) },
 
         "^Recommended for ages (\\d+)-(\\d+)$".toRegex(CANON_EQ) to fun(matches: MatchResult) : RecommendedAge {
             matches.verify(2)
@@ -113,10 +113,7 @@ class DateTimeParsers {
     // ======================================================================
 
     fun parseEventDateTime(str: String) : EventDateTime {
-            // timestr => "Wednesday, July 19, 2023 - 7:00 PM to 8:00 PM"
-            if (str == null) {
-                throw IllegalArgumentException("cannot extract event date/time from input")
-            }
+            // str => "Wednesday, July 19, 2023 - 7:00 PM to 8:00 PM"
 
             // dateStr => "Wednesday, July 19, 2023", timeRangeStr => "7:00 PM to 8:00 PM"
             val (dateStr, timeRangeStr) = let {

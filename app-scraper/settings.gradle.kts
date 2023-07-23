@@ -1,1 +1,1 @@
-rootProject.name = "library-calendar-scraper"
+rootProject.name = "scraper"

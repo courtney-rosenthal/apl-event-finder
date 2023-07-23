@@ -158,7 +158,7 @@ class EventScraper(
             event.subTitle = element.singleTextNode(element, issues, isOptional = true)
         },
 
-        "div.apl-event-summary" to  { element: Element, event: CalendarEvent, issues: ScrapeIssues ->
+        "div.apl-event-summary" to  { element: Element, event: CalendarEvent, _: ScrapeIssues ->
             event.summary = element.collectText().collate()
         },
 

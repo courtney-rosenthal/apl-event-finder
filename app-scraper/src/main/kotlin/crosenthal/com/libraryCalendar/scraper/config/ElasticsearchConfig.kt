@@ -1,6 +1,5 @@
 package crosenthal.com.libraryCalendar.scraper.config
 
-import org.elasticsearch.client.RestHighLevelClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.elasticsearch.client.ClientConfiguration
@@ -10,11 +9,12 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 
 
 @Configuration
-@EnableElasticsearchRepositories(basePackages = ["crosenthal.com.librarycalendar.scraper.repository"])
+@EnableElasticsearchRepositories(basePackages = ["crosenthal.com.libraryCalendar.scraper.repository"])
 class ElasticsearchConfig : AbstractElasticsearchConfiguration() {
 
     @Bean
-    override fun elasticsearchClient(): RestHighLevelClient {
+    @Suppress("DEPRECATION") // https://github.com/spring-projects/spring-boot/issues/28598
+    override fun elasticsearchClient(): org.elasticsearch.client.RestHighLevelClient {
         val clientConfiguration: ClientConfiguration = ClientConfiguration.builder()
             .connectedTo("localhost:9200")
             .build()
