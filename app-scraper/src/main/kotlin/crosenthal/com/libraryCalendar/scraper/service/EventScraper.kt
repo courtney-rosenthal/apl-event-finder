@@ -210,7 +210,7 @@ class EventScraper(
 
         val event = CalendarEvent(url, eventSource.html())
 
-        val issues = ScrapeIssues()
+        val issues = ScrapeIssues(url, eventSource.html())
 
         val processedElements = mutableSetOf<String>()
 

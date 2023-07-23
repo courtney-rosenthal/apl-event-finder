@@ -1,15 +1,26 @@
 package crosenthal.com.libraryCalendar.scraper.domain
 
 import org.jsoup.nodes.Node
+import org.springframework.data.annotation.Id
 import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
+import org.springframework.data.elasticsearch.annotations.FieldType
+import java.time.Instant
 
 @Document(indexName = "scrape-issues")
+class ScrapeIssues(url: String, eventSource: String) {
 
-class ScrapeIssues {
+    @Id
+    val url = url
 
-    @Field
-    val issues: MutableList<ScrapeIssue> = mutableListOf()
+    @Field(type = FieldType.Text, store = true)
+    val eventSource = eventSource
+
+    @Field(type = FieldType.Nested)
+    val issues = mutableListOf<ScrapeIssue>()
+
+    @Field(type = FieldType.Date)
+    val timestamp = Instant.now()
 
     var noIssuesFound: Boolean = true
         private set

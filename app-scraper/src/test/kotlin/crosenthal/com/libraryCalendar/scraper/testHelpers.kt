@@ -19,7 +19,7 @@ object testHelpers {
     const val TEST_PAGES_INDEX = TEST_PAGES + "/index"
 
     // this is an example URL of one piece of content in the TEST_PAGES directory
-    const val TEST_URL = "http://library.austintexas.gov/event/graphic-novel-book-club/graphic-novel-book-club-7727946.html"
+    const val TEST_URL = "http://library.austintexas.gov/event/graphic-novel-book-club/graphic-novel-book-club-7727946"
 
     fun openTestDocument(url: String = TEST_URL) : InputStream {
         val filename = TEST_PAGES + url.split('/').last()

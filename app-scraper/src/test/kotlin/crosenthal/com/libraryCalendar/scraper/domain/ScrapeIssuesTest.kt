@@ -7,7 +7,7 @@ internal class ScrapeIssuesTest {
 
     @Test
     fun noIssuesFound() {
-        val issues = ScrapeIssues()
+        val issues = ScrapeIssues("url", "eventSource")
         assertThat(issues.noIssuesFound).isTrue()
         issues.add("message", "resolution")
         assertThat(issues.noIssuesFound).isFalse()
