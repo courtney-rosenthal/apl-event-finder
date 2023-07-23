@@ -8,26 +8,29 @@ import org.springframework.data.elasticsearch.annotations.FieldType
 import java.time.Instant
 
 @Document(indexName = "scrape-issues")
-class ScrapeIssues(url: String, eventSource: String) {
+data class ScrapeIssues(
 
     @Id
-    val url = url
+    val url: String,
 
     @Field(type = FieldType.Text, store = true)
-    val eventSource = eventSource
+    val eventSource: String,
 
     @Field(type = FieldType.Nested)
-    val issues = mutableListOf<ScrapeIssue>()
+    val issues: MutableList<ScrapeIssue> = mutableListOf(),
 
     @Field(type = FieldType.Date)
-    val timestamp = Instant.now()
+    val timestamp : Instant = Instant.now(),
 
-    var noIssuesFound: Boolean = true
+) {
+
+    @Field(type = FieldType.Boolean)
+    var hasIssues: Boolean = false
         private set
 
     fun add(message: String, resolution: String, node: Node? = null) {
         issues.add(ScrapeIssue(message, resolution, node))
-        noIssuesFound = false
+        hasIssues = true
     }
 }
 

@@ -133,12 +133,18 @@ class EventScraper(
 
 
     fun loadDocumentFromUrl(url: String) : Document {
-        return Jsoup.connect(url).get()
+        LOG.debug().log("loadDocumentFromUrl: entered, url = {}", url)
+        val doc = Jsoup.connect(url).get()
+        LOG.debug().log("loadDocumentFromUrl: finished")
+        return doc
     }
 
 
     fun loadDocumentFromStream(inStream: InputStream, baseUri: String) : Document {
-        return Jsoup.parse(inStream, "UTF-8", baseUri)
+        LOG.debug().log("loadDocumentFromStream: entered, baseUri = {}", baseUri)
+        val doc = Jsoup.parse(inStream, "UTF-8", baseUri)
+        LOG.debug().log("loadDocumentFromUrl: finished")
+        return doc
     }
 
 
@@ -199,6 +205,7 @@ class EventScraper(
 
     fun scrapeToEvent(doc: Document, url: String) : Pair<CalendarEvent, ScrapeIssues> {
 
+        LOG.debug().log("scrapeToEvent: entered, url = {}", url)
 
         val eventSource = let {
             val a = doc.select("div.apl-event")
@@ -251,8 +258,11 @@ class EventScraper(
             issues.add(ex.getRootMessage(), "ignored", null)
         }
 
-        // TODO - check for missing fields
+        if (issues.hasIssues) {
+            LOG.warn().log("scrapeToEvent: issues found with document url={}", url)
 
+        }
+        LOG.debug().log("scrapeToEvent: finished")
         return Pair(event, issues)
     }
 

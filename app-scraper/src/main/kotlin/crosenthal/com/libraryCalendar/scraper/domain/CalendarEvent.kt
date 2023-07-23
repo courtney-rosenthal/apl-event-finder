@@ -17,6 +17,9 @@ data class CalendarEvent(
     @Field(type = FieldType.Text, store = true)
     val content: String,
 
+    @Field(type = FieldType.Boolean)
+    val isDeleted: Boolean = false,
+
     @Field(type = FieldType.Text, store = true)
     var title: String? = null,
 

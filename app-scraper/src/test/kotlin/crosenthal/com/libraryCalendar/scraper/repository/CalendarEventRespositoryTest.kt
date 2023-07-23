@@ -23,7 +23,7 @@ class CalendarEventRespositoryTest {
     fun save() {
         val doc = scraper.loadDocumentFromStream(openTestDocument(), TEST_URL)
         val (event, issues) = scraper.scrapeToEvent(doc, TEST_URL)
-        assertThat(issues.noIssuesFound).isTrue()
+        assertThat(issues.hasIssues).isTrue()
         calendarEventRepository.save(event)
     }
 

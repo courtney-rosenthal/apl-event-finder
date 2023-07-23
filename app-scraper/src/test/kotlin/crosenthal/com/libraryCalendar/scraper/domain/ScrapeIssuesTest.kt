@@ -8,9 +8,9 @@ internal class ScrapeIssuesTest {
     @Test
     fun noIssuesFound() {
         val issues = ScrapeIssues("url", "eventSource")
-        assertThat(issues.noIssuesFound).isTrue()
+        assertThat(issues.hasIssues).isTrue()
         issues.add("message", "resolution")
-        assertThat(issues.noIssuesFound).isFalse()
+        assertThat(issues.hasIssues).isFalse()
     }
 
 }

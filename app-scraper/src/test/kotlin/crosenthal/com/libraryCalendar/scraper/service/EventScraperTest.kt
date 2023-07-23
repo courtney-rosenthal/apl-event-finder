@@ -10,7 +10,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
-import java.time.Period
 
 internal class EventScraperTest {
 
@@ -27,7 +26,7 @@ internal class EventScraperTest {
     fun `process a single event`() {
         val doc = scraper.loadDocumentFromStream(openTestDocument(), TEST_URL)
         val (event, issues) = scraper.scrapeToEvent(doc, TEST_URL)
-        assertThat(issues.noIssuesFound)
+        assertThat(issues.hasIssues)
 
         val expected =  CalendarEvent(
             url = TEST_URL,
@@ -68,7 +67,7 @@ internal class EventScraperTest {
             } catch (ex: Throwable) {
                 throw RuntimeException("error while loading: $url", ex)
             }
-            assertThat(issues.noIssuesFound).isTrue()
+            assertThat(issues.hasIssues).isTrue()
             assertThat(event).isNotNull()
         }
     }

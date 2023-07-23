@@ -8,5 +8,7 @@ import org.springframework.context.annotation.Configuration
 @ConfigurationProperties(prefix = "application")
 @ConfigurationPropertiesScan
 class ApplicationProperties {
-    public var eventsRss: String = "https://library.austintexas.gov/events-feed.xml"
+    var eventsRss: String = "https://library.austintexas.gov/events-feed.xml"
+    var coerceToHttps: Boolean = true
+    var maxPagesScraped: Int = 10
 }
