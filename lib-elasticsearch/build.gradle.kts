@@ -40,6 +40,10 @@ tasks.withType<KotlinCompile> {
 	}
 }
 
+tasks.getByName("bootJar") {
+	enabled = false
+}
+
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
