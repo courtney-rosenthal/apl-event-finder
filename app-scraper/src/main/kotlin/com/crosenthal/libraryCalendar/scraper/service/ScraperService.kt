@@ -1,7 +1,7 @@
 package com.crosenthal.libraryCalendar.scraper.service
 
-import com.crosenthal.libraryCalendar.elasticsearch.repository.CalendarEventRepository
-import com.crosenthal.libraryCalendar.elasticsearch.repository.ScrapeIssuesRepository
+import com.crosenthal.libraryCalendar.elasticsearch.service.CalendarEventService
+import com.crosenthal.libraryCalendar.elasticsearch.service.ScrapeIssuesService
 import com.crosenthal.libraryCalendar.scraper.ScraperApplication
 import com.crosenthal.libraryCalendar.scraper.config.ApplicationProperties
 import org.fissore.slf4j.FluentLoggerFactory
@@ -13,8 +13,8 @@ import java.net.URL
 class ScraperService(
     val eventsFeed: EventsFeed,
     val eventScraper: EventScraper,
-    val calendarEventRepository: CalendarEventRepository,
-    val scrapeIssuesRepository: ScrapeIssuesRepository,
+    val calendarEventService: CalendarEventService,
+    val scrapeIssuesService: ScrapeIssuesService,
     @Qualifier("applicationProperties") val config: ApplicationProperties
 ) {
 
@@ -22,19 +22,20 @@ class ScraperService(
         val LOG = FluentLoggerFactory.getLogger(ScraperApplication::class.java)
     }
 
-    fun scrapeOneLink(url: String) {
+    fun scrapeAndSaveOneLink(url: String) {
         val doc = eventScraper.loadDocumentFromUrl(url)
         val (event, issues) = eventScraper.scrapeToEvent(doc, url)
-        calendarEventRepository.save(event)
-        scrapeIssuesRepository.save(issues)
+        calendarEventService.save(event)
+        scrapeIssuesService.save(issues)
+        LOG.debug().log("scrapeAndSaveOneLink: saved event url={}", url)
     }
 
-    fun performFullSrape() {
+    fun performFullSrapeAndSave() {
         LOG.info().log("performScrape: starting")
         eventsFeed.extractLinksFromFeed(URL(config.eventsRss))
             .take(10)
             .forEach {
-                scrapeOneLink(it)
+                scrapeAndSaveOneLink(it)
             }
         LOG.info().log("performScrape: finished")
     }

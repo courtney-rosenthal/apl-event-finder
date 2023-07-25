@@ -10,13 +10,12 @@ import org.springframework.context.ApplicationListener
 
 
 @SpringBootApplication(scanBasePackages = ["com.crosenthal.libraryCalendar"])
-
-class ScraperApplication(
+open class ScraperApplication(
 	val applicationContext: ApplicationContext,
 	val scraperService: ScraperService
 )  : ApplicationListener<ApplicationReadyEvent> {
 	override fun onApplicationEvent(event: ApplicationReadyEvent) {
-		scraperService.performFullSrape()
+		scraperService.performFullSrapeAndSave()
 		SpringApplication.exit(applicationContext)
 	}
 }

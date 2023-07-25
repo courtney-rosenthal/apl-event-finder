@@ -16,6 +16,7 @@ dependencies {
 	implementation("org.fissore:slf4j-fluent:0.14.0")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("io.mockk:mockk:1.13.5")
 	testImplementation("org.assertj:assertj-core:3.24.2")
 
 	// for integration testing

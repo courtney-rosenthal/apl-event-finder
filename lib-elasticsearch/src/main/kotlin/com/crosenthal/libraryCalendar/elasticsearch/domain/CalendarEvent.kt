@@ -1,13 +1,12 @@
 package com.crosenthal.libraryCalendar.elasticsearch.domain
 
-import ccom.crosenthal.libraryCalendar.elasticsearch.domain.RecommendedAge
 import org.springframework.data.annotation.Id
 import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
 import org.springframework.data.elasticsearch.annotations.FieldType
 import java.time.Instant
 
-@Document(indexName = "events")
+@Document(indexName = "#{@elasticsearchProperties.indexPrefix}events")
 data class CalendarEvent(
 
     @Id

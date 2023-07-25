@@ -6,7 +6,7 @@ import org.springframework.data.elasticsearch.annotations.Field
 import org.springframework.data.elasticsearch.annotations.FieldType
 import java.time.Instant
 
-@Document(indexName = "scrape-issues")
+@Document(indexName = "#{@elasticsearchProperties.indexPrefix}scrape-issues")
 data class ScrapeIssues(
 
     @Id

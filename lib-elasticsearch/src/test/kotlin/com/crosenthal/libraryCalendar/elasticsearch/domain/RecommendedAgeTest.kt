@@ -1,6 +1,5 @@
 package com.crosenthal.libraryCalendar.elasticsearch.domain
 
-import ccom.crosenthal.libraryCalendar.elasticsearch.domain.RecommendedAge
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
