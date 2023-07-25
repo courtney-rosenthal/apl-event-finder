@@ -1,6 +1,6 @@
 package com.crosenthal.libraryCalendar.scraper.service
 
-import ccom.crosenthal.libraryCalendar.elasticsearch.domain.RecommendedAge
+import com.crosenthal.libraryCalendar.elasticsearch.domain.RecommendedAge
 import com.crosenthal.libraryCalendar.elasticsearch.domain.EventDateTime
 import com.crosenthal.libraryCalendar.scraper.util.cleanupWhiteSpace
 import org.springframework.stereotype.Service

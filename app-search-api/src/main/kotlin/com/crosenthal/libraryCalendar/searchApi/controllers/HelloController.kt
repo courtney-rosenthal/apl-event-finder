@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api")
 class HelloController {
     @GetMapping
     fun greeting(@RequestParam(defaultValue = "world") target: String): String {

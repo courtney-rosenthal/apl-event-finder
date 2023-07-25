@@ -33,7 +33,7 @@ class ScraperService(
     fun performFullSrapeAndSave() {
         LOG.info().log("performScrape: starting")
         eventsFeed.extractLinksFromFeed(URL(config.eventsRss))
-            .take(10)
+            .take(20)
             .forEach {
                 scrapeAndSaveOneLink(it)
             }
