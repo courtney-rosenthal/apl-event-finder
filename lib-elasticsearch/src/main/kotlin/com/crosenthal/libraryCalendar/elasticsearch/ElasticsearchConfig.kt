@@ -9,8 +9,8 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 
 
 @Configuration
-@EnableElasticsearchRepositories //(basePackages = ["crosenthal.com.libraryCalendar.scraper.repository"])
-class ElasticsearchConfig : AbstractElasticsearchConfiguration() {
+@EnableElasticsearchRepositories
+open class ElasticsearchConfig : AbstractElasticsearchConfiguration() {
 
     @Bean
     @Suppress("DEPRECATION") // https://github.com/spring-projects/spring-boot/issues/28598
