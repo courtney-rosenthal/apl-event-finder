@@ -1,6 +1,8 @@
 # To Do
 
-* app-api - implement search endpoint
+* figure out why logging (e.g. Elasticsearch loggers) aren't working
+* 
+* app-api - complete search endpoint
 
 * app-scraper - complete extractLocation()
 * app-scraper - cleanup EventScraper

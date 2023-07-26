@@ -30,10 +30,10 @@ data class CalendarEvent(
     @Field(type = FieldType.Text, store = true)
     var description: String? = null,
 
-    @Field(type = FieldType.Nested)
+    @Field(type = FieldType.Object)
     var recommendedAge: RecommendedAge? = null,
 
-    @Field(type = FieldType.Nested)
+    @Field(type = FieldType.Object)
     var time: EventDateTime? = null,
 
     @Field(type = FieldType.Text, store = true)

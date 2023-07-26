@@ -1,6 +1,7 @@
 package com.crosenthal.libraryCalendar.searchApi.controllers
 
 import com.crosenthal.libraryCalendar.elasticsearch.domain.CalendarEvent
+import com.crosenthal.libraryCalendar.elasticsearch.misc.SearchConditions
 import com.crosenthal.libraryCalendar.elasticsearch.service.CalendarEventService
 import com.crosenthal.libraryCalendar.searchApi.exceptions.EntityNotFound
 import org.springframework.data.elasticsearch.core.SearchHits
@@ -22,8 +23,11 @@ class CalendarEventController(
 
     @GetMapping("/search")
     fun search(
+        @RequestParam days: Set<SearchConditions.Day>?,
+        @RequestParam times: Set<SearchConditions.Time>?,
+        @RequestParam branches: Set<SearchConditions.Branch>?,
         @RequestParam q: String?
     ) : SearchHits<CalendarEvent> {
-        return service.search(q!!)
+        return service.search(days = days, times = times, branches = branches, q = q)
     }
 }
