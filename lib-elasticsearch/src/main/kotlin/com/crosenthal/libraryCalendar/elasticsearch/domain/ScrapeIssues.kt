@@ -5,6 +5,7 @@ import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
 import org.springframework.data.elasticsearch.annotations.FieldType
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 @Document(indexName = "#{@elasticsearchProperties.indexPrefix}scrape-issues")
 data class ScrapeIssues(
@@ -19,7 +20,7 @@ data class ScrapeIssues(
     val issues: MutableList<ScrapeIssue> = mutableListOf(),
 
     @Field(type = FieldType.Date)
-    val timestamp : Instant = Instant.now(),
+    val timestamp : Instant = Instant.now().truncatedTo(ChronoUnit.MILLIS),
 
 ) {
 

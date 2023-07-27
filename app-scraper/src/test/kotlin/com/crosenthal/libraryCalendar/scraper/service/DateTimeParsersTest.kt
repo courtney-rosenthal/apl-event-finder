@@ -1,6 +1,6 @@
 package crosenthal.com.libraryCalendar.scraper.service
 
-import ccom.crosenthal.libraryCalendar.elasticsearch.domain.RecommendedAge
+import com.crosenthal.libraryCalendar.elasticsearch.domain.RecommendedAge
 import com.crosenthal.libraryCalendar.elasticsearch.domain.EventDateTime
 import com.crosenthal.libraryCalendar.scraper.service.DateTimeParsers
 import org.assertj.core.api.Assertions.assertThat

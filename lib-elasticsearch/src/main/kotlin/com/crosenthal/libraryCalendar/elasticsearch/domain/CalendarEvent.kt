@@ -5,6 +5,7 @@ import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
 import org.springframework.data.elasticsearch.annotations.FieldType
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 @Document(indexName = "#{@elasticsearchProperties.indexPrefix}events")
 data class CalendarEvent(
@@ -30,10 +31,10 @@ data class CalendarEvent(
     @Field(type = FieldType.Text, store = true)
     var description: String? = null,
 
-    @Field(type = FieldType.Object)
+    @Field(type = FieldType.Object, store = true)
     var recommendedAge: RecommendedAge? = null,
 
-    @Field(type = FieldType.Object)
+    @Field(type = FieldType.Object, store = true)
     var time: EventDateTime? = null,
 
     @Field(type = FieldType.Text, store = true)
@@ -49,7 +50,7 @@ data class CalendarEvent(
     var tags: List<String> = emptyList(),
 
     @Field(type = FieldType.Date)
-    val timestamp: Instant = Instant.now(),
+    val timestamp: Instant = Instant.now().truncatedTo(ChronoUnit.MILLIS),
 
     ) {
     fun checkRequiredFields() {

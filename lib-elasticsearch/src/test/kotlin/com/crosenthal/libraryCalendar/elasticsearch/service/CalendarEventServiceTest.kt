@@ -51,9 +51,4 @@ internal class CalendarEventServiceTest {
         assertThat(result).isNull()
     }
 
-    @Test
-    @Disabled
-    fun search() {
-        TODO()
-    }
 }

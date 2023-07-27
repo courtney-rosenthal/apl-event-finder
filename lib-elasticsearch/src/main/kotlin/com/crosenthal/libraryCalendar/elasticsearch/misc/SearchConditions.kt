@@ -25,6 +25,11 @@ object SearchConditions {
                 else -> setOf(this)
             }
         }
+
+        fun storedValue(): String {
+            return this.toString().lowercase().replaceFirstChar(Char::titlecase)
+        }
+
     }
 
     enum class Time(override val description: String): IsDescribed {
@@ -67,6 +72,23 @@ object SearchConditions {
         AWP("Windsor Park"),
         AYB("Yarborough"),
         OTHER("other location");
+
+        fun storedValue(): String {
+            return this.toString()
+        }
+    }
+
+    // categories based on: https://www.cdc.gov/ncbddd/childdevelopment/positiveparenting/index.html
+    enum class AttendeeAge(val minYears: Int?, val maxYears: Int?, override val description: String): IsDescribed {
+        INFANT(null, 1, "Infant (1 year and below)"),
+        TODDLER(1, 3, "Toddler (ages 1-3)"),
+        PRESCHOOLER(3, 5, "Preschooler (ages 3-5)"),
+        EARLY_CHILDHOOD(6, 8, "Early Childhood (ages 6-8)"),
+        MIDDLE_CHILDHOOD(9, 11, "Middle Childhood (ages 9-11)"),
+        YOUNG_TEEN(12, 14, "Young Teen (ages 12-14)"),
+        TEEN(15, 18, "Teen (ages 15-17)"),
+        ADULT(18, null, description = "Adult (ages 18 and up)");
+
     }
 
 }

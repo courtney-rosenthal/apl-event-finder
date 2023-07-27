@@ -1,8 +1,26 @@
-# Library Calendar - Event Scraper Microservice
+# APL Library Event Calendar Search & Notification
 
-## Packages used in this project
+This application provides advanced search capability for
+the Austin Public Library events calendar 
+<https://library.austintexas.gov/events>.
 
-ROME - RSS and ATOM feeds -- https://rometools.github.io/rome/
+There are four microservices in this project:
 
-jsoup - HTML parser -- https://jsoup.org
+* app-scraper -- Scrapes the event calendar into a searchable index
+* app-search-api -- REST API for searching the index
+* app-ui -- Front end application
+* (TBD: Service to manage notifications)
+
+## Dev Environment
+
+To build:
+
+    docker-compose up
+    ./gradlew build
+
+TODO: add directions to run the services
+
+## Author
+
+Courtney Rosenthal <cr@crosentha.com>
 

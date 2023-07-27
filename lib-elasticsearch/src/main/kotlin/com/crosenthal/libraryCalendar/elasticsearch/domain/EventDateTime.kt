@@ -17,10 +17,10 @@ data class EventDateTime(
     @Field(type = FieldType.Date)
     val end: Instant?,
 
-    @Field(type = FieldType.Integer, store = true)
+    @Field(type = FieldType.Integer)
     val localHourOfDay: Int,
 
-    @Field(type = FieldType.Keyword, store = true)
+    @Field(type = FieldType.Keyword)
     val localDayOfWeek: String,
 ) {
 

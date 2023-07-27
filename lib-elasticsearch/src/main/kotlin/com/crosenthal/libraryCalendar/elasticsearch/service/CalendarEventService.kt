@@ -6,7 +6,6 @@ import com.crosenthal.libraryCalendar.elasticsearch.repository.CalendarEventRepo
 import org.elasticsearch.index.query.QueryBuilders
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
-import org.springframework.data.elasticsearch.core.SearchHits
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.stereotype.Service
 
@@ -19,11 +18,12 @@ class CalendarEventService(
     lateinit var operations: ElasticsearchOperations
 
     fun search(
-        days: Set<SearchConditions.Day>?,
-        times: Set<SearchConditions.Time>?,
-        branches: Set<SearchConditions.Branch>?,
-        q: String?
-    ): SearchHits<CalendarEvent> {
+        days: Set<SearchConditions.Day>? = null,
+        times: Set<SearchConditions.Time>? = null,
+        branches: Set<SearchConditions.Branch>? = null,
+        attendeeAge: SearchConditions.AttendeeAge? = null,
+        q: String? = null
+    ): List<CalendarEvent> {
 
         // TODO: add recommended age
         // TODO: add tags
@@ -33,7 +33,7 @@ class CalendarEventService(
         var query = QueryBuilders.boolQuery()
 
         if (! days.isNullOrEmpty()) {
-            val a = days.flatMap {it.expand()}.map {it.name}.toSet()
+            val a = days.flatMap {it.expand()}.map {it.description }.toSet()
             query = query.must(QueryBuilders.termsQuery("time.localDayOfWeek", a))
         }
 
@@ -43,7 +43,30 @@ class CalendarEventService(
         }
 
         if (! branches.isNullOrEmpty()) {
-            query = query.must(QueryBuilders.termsQuery("location.branch", branches))
+            query = query.must(QueryBuilders.termsQuery("location.branch", branches.map(SearchConditions.Branch::storedValue)))
+        }
+
+        if (attendeeAge != null) {
+            if (attendeeAge.minYears != null) {
+                val field_not_defined =
+                    QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("recommendedAge.minYears"))
+                val fiend_in_range =
+                    QueryBuilders.rangeQuery("recommendedAge.minYears").lte(attendeeAge.minYears)
+                query = query.must(QueryBuilders.boolQuery()
+                    .should(field_not_defined)
+                    .should(fiend_in_range)
+                    .minimumShouldMatch(1))
+            }
+            if (attendeeAge.maxYears != null) {
+                val field_not_defined =
+                    QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("recommendedAge.maxYears"))
+                val fiend_in_range =
+                    QueryBuilders.rangeQuery("recommendedAge.maxYears").gte(attendeeAge.maxYears)
+                query = query.must(QueryBuilders.boolQuery()
+                    .should(field_not_defined)
+                    .should(fiend_in_range)
+                    .minimumShouldMatch(1))
+            }
         }
 
         if (! q.isNullOrBlank()) {
@@ -52,6 +75,7 @@ class CalendarEventService(
 
         var nativeSearchQuery = NativeSearchQueryBuilder().withQuery(query).build()
         val hits = operations.search(nativeSearchQuery, CalendarEvent::class.java)
-        return hits
+
+        return hits.searchHits.map {it.content}
     }
 }

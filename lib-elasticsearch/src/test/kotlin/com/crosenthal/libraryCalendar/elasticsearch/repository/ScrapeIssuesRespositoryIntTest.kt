@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest(classes = [ElasticsearchProperties::class, ElasticsearchConfig::class])
 @EnableConfigurationProperties(ElasticsearchProperties::class)
-class ScrapeIssuesRespositoryTest {
+class ScrapeIssuesRespositoryIntTest {
 
     @Autowired
     lateinit var repository: ScrapeIssuesRepository
@@ -29,15 +29,11 @@ class ScrapeIssuesRespositoryTest {
     fun save() {
         assertThat(repository.findById(URL)).isEmpty
 
-        val issue = ScrapeIssues(url = URL, eventSource = EVENT_SOURCE)
-        repository.save(issue)
+        val issues = repository.save(ScrapeIssues(url = URL, eventSource = EVENT_SOURCE))
 
-        val retrieved = repository.findById(URL)
-        assertThat(retrieved).isNotEmpty
-        assertThat(retrieved.get())
-            .usingRecursiveComparison()
-            .ignoringFields("timestamp")
-            .isEqualTo(issue)
+        val result = repository.findById(URL)
+        assertThat(result).isNotEmpty
+        assertThat(result.get()).isEqualTo(issues)
     }
 
 }

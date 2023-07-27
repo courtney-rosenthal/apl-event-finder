@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest(classes = [ElasticsearchProperties::class, ElasticsearchConfig::class])
 @EnableConfigurationProperties(ElasticsearchProperties::class)
-class CalendarEventRespositoryTest {
+class CalendarEventRespositoryIntTest {
 
     @Autowired
     lateinit var repository: CalendarEventRepository
@@ -29,15 +29,11 @@ class CalendarEventRespositoryTest {
     fun save() {
         assertThat(repository.findById(URL)).isEmpty
 
-        val event = CalendarEvent(url = URL, content = CONTENT)
-        repository.save(event)
+        val event = repository.save(CalendarEvent(url = URL, content = CONTENT))
 
-        val retrieved = repository.findById(URL)
-        assertThat(retrieved).isNotEmpty
-        assertThat(retrieved.get())
-            .usingRecursiveComparison()
-            .ignoringFields("timestamp")
-            .isEqualTo(event)
+        val result = repository.findById(URL)
+        assertThat(result).isNotEmpty
+        assertThat(result.get()).isEqualTo(event)
     }
 
 }
