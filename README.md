@@ -5,19 +5,21 @@ for Austin Public Library events.
 
 STATUS: in development
 
-It scrapes the APL event calendar (https://library.austintexas.gov/events) into
-a searchable index. The front end application provides (will provide) advanced 
-search and creating of notifications based on search criteria.
+This application scrapes the APL event calendar
+(https://library.austintexas.gov/events) into a searchable index. The 
+frontend application provides  (will provide) advanced search and creating of 
+notifications based on search criteria.
 
 There are four microservices in this project:
 
 * app-scraper -- Scrapes the event calendar into a searchable index
 * app-search-api -- REST API for searching the index
-* app-ui -- Front end application
 * (TBD: Service to manage notifications)
+* app-ui -- Front end application
 
 STATUS: The _app-scraper_ and _app-search-api_ services have MVP 
-implementations. The _app-ui_ MVP is the next step.
+implementations. Next step is the _app-ui_ MVP. See the TODO.md document for 
+short-term development plans.
 
 ## Development and Build
 
@@ -33,10 +35,12 @@ To build:
     ./gradlew clean build -x check  # perform build (skip tests)
     ./gradlew check                 # perform tests
 
+## Deployment
+
+This package is not ready for deployment.
+
 At this time, execution is being done through the IDE. Standalone execution 
 (initially Gradle _bootrun_ tasks, eventually Docker containers) are TBD.
-
-See the TODO.md file for pending tasks.
 
 ## Author
 
