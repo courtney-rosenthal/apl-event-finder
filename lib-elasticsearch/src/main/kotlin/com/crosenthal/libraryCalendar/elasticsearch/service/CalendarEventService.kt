@@ -48,9 +48,9 @@ class CalendarEventService(
         if (age != null) {
             if (age.minYears != null) {
                 val field_not_defined =
-                    QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("recommendedAge.minYears"))
+                    QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("recommendedAge.maxYears"))
                 val fiend_in_range =
-                    QueryBuilders.rangeQuery("recommendedAge.minYears").lte(age.minYears)
+                    QueryBuilders.rangeQuery("recommendedAge.maxYears").gte(age.minYears)
                 query = query.must(QueryBuilders.boolQuery()
                     .should(field_not_defined)
                     .should(fiend_in_range)
@@ -58,9 +58,9 @@ class CalendarEventService(
             }
             if (age.maxYears != null) {
                 val field_not_defined =
-                    QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("recommendedAge.maxYears"))
+                    QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("recommendedAge.minYears"))
                 val fiend_in_range =
-                    QueryBuilders.rangeQuery("recommendedAge.maxYears").gte(age.maxYears)
+                    QueryBuilders.rangeQuery("recommendedAge.minYears").lte(age.maxYears)
                 query = query.must(QueryBuilders.boolQuery()
                     .should(field_not_defined)
                     .should(fiend_in_range)

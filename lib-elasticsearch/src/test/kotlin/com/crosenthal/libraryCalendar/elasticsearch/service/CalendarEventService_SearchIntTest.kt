@@ -107,8 +107,17 @@ internal class CalendarEventService_SearchIntTest {
         val age_13_18 = makeEvent("age_13_18", recommendedAge = makeAge(13, 18))
         val age_all = makeEvent("age_all", recommendedAge = makeAge(null, null))
 
+        // INFANT -> age 1 year and below
+        assertThat(service.search(age = AttendeeAge.INFANT)).containsExactlyInAnyOrder(age_0_5, age_0_7, age_all)
+
         // CHILD -> ages 6 - 8
         assertThat(service.search(age = AttendeeAge.CHILD)).containsExactlyInAnyOrder(age_0_7, age_5_10, age_7_up, age_all)
+
+        // TEEN -> ages 15 - 17
+        assertThat(service.search(age = AttendeeAge.TEEN)).containsExactlyInAnyOrder(age_7_up, age_13_18, age_all)
+
+        // ADULT -> ages 21 and up
+        assertThat(service.search(age = AttendeeAge.ADULT)).containsExactlyInAnyOrder(age_7_up, age_all)
     }
 
     @Test
