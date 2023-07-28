@@ -1,4 +1,4 @@
 logging:
   level:
-    com.crosenthal.libraryCalendar: debug
+    com.crosenthal.eventFinder: debug
     org.springframework.data.elasticsearch: debug

@@ -4,4 +4,4 @@ spring:
 
 logging:
   level:
-    com.crosenthal.libraryCalendar: debug
+    com.crosenthal.eventFinder: debug
