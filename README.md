@@ -1,4 +1,4 @@
-# APL Library Event Calendar Search & Notification
+# APL Event Finder
 
 This application provides advanced search capability for
 the Austin Public Library events calendar 
@@ -22,5 +22,5 @@ TODO: add directions to run the services
 
 ## Author
 
-Courtney Rosenthal <cr@crosentha.com>
+Courtney Rosenthal <cr@crosenthal.com>
 

@@ -48,7 +48,7 @@ internal class EventScraperTest {
             location = "place\nBetter Half Coffee\n406 Walsh St."
             registrationUrl = "https://www.eventbrite.com/e/graphic-novel-book-club-batman-and-robin-by-grant-morrison-tickets-644454941077"
             isFree = true
-            tags = listOf("Adult", "Graphic Novel Book Club")
+            tags = setOf("Adult", "Graphic Novel Book Club")
         }
 
         assertThat(event)

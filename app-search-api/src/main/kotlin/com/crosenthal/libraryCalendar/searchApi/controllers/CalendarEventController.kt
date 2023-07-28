@@ -29,6 +29,7 @@ class CalendarEventController(
         @RequestParam times: Set<SearchConditions.Time>?,
         @RequestParam branches: Set<SearchConditions.Branch>?,
         @RequestParam attendeeAge: SearchConditions.AttendeeAge?,
+        @RequestParam tags: Set<String>?,
         @RequestParam q: String?
     ) : List<CalendarEvent> {
         return service.search(
@@ -36,6 +37,7 @@ class CalendarEventController(
             times = times,
             branches = branches,
             age = attendeeAge,
+            tags = tags ?: emptySet(),
             q = q
         )
     }

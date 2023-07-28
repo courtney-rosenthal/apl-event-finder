@@ -121,11 +121,12 @@ class EventScraper(
     }
 
 
-    internal fun extractTags(element: Element, issues: ScrapeIssues): List<String> {
+    internal fun extractTags(element: Element, issues: ScrapeIssues): Set<String> {
         return element.childNodes()
             .filter { it is Element && it.tagName() == "a" }
             .map { it.singleTextNode(element, issues) }
             .filterNotNull()
+            .toSet()
     }
 
 

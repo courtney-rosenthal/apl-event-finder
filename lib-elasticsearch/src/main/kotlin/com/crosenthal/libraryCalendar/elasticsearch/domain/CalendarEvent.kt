@@ -47,7 +47,7 @@ data class CalendarEvent(
     var isFree: Boolean? = null,
 
     @Field(type = FieldType.Keyword)
-    var tags: List<String> = emptyList(),
+    var tags: Set<String> = emptySet(),
 
     @Field(type = FieldType.Date)
     val timestamp: Instant = Instant.now().truncatedTo(ChronoUnit.MILLIS),

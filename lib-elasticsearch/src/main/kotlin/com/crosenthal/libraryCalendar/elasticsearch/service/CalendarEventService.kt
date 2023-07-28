@@ -22,6 +22,7 @@ class CalendarEventService(
         times: Set<SearchConditions.Time>? = null,
         branches: Set<SearchConditions.Branch>? = null,
         age: SearchConditions.AttendeeAge? = null,
+        tags: Set<String>? = null,
         q: String? = null
     ): List<CalendarEvent> {
 
@@ -66,6 +67,10 @@ class CalendarEventService(
                     .should(fiend_in_range)
                     .minimumShouldMatch(1))
             }
+        }
+
+        if (! tags.isNullOrEmpty()) {
+            query = query.must(QueryBuilders.termsQuery("tags", tags))
         }
 
         if (! q.isNullOrBlank()) {

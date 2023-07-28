@@ -41,13 +41,15 @@ internal class CalendarEventService_SearchIntTest {
         url: String,
         content: String =  UUID.randomUUID().toString(),
         time: EventDateTime? = null,
-        recommendedAge: RecommendedAge? = null
+        recommendedAge: RecommendedAge? = null,
+        tags: Set<String> = emptySet(),
     ): CalendarEvent {
         return repository.save(CalendarEvent(
             url = url,
             content = content,
             time = time,
             recommendedAge = recommendedAge,
+            tags = tags,
         ))
     }
 
@@ -118,6 +120,20 @@ internal class CalendarEventService_SearchIntTest {
 
         // ADULT -> ages 21 and up
         assertThat(service.search(age = AttendeeAge.ADULT)).containsExactlyInAnyOrder(age_7_up, age_all)
+    }
+
+    @Test
+    fun `search by tags`() {
+        val (TAG1, TAG2, TAG3, TAG4) = arrayOf("tag1", "tag2", "tag3", "tag4")
+        val t0 = makeEvent("t0", tags = emptySet())
+        val t1 = makeEvent("t1", tags = setOf(TAG1) )
+        val t23 = makeEvent("t23", tags = setOf(TAG2, TAG3) )
+        val t3 = makeEvent("t3", tags = setOf(TAG3) )
+
+        assertThat(service.search(tags = setOf(TAG1))).containsExactlyInAnyOrder(t1)
+        assertThat(service.search(tags = setOf(TAG1, TAG2))).containsExactlyInAnyOrder(t1, t23)
+        assertThat(service.search(tags = setOf(TAG4))).isEmpty()
+        assertThat(service.search(tags = setOf(TAG1, TAG4))).containsExactlyInAnyOrder(t1)
     }
 
     @Test
