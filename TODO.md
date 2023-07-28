@@ -1,16 +1,18 @@
 # To Do
 
 * figure out why logging (e.g. Elasticsearch loggers) aren't working
-* implement loading of test data
+* fix top-level test for IntelliJ
+* app-scraper - implement loading of test data
+* add bootRun capability to Gradle files
 
-* app-scraper - complete extractLocation()
+* app-ui - ayup
+* 
+* app-scraper - complete extractLocation() (and location search)
 * app-scraper - cleanup EventScraper
 * app-scraper - add config to force https
 
-* app-scraper - add Redis and record scrapes
+* app-scraper - add Redis and record scrapes (to track adds/deletes)
 * app-scraper - record tags to Redis
-* app-scraper - record locations to Redis
-
-* app-scraper - add mode to just checks for adds/deletes
-
-* app-ui - someday
+* app-scraper - record locations to Redis (not sure this is needed)
+* app-scraper - add mode to just check for adds/deletes
+* app-scraper - add periodic scheduling for scrapes
