@@ -5,7 +5,6 @@ import com.crosenthal.libraryCalendar.elasticsearch.misc.SearchConditions
 import com.crosenthal.libraryCalendar.elasticsearch.service.CalendarEventService
 import com.crosenthal.libraryCalendar.searchApi.exceptions.EntityNotFound
 import io.swagger.v3.oas.annotations.Operation
-import org.springframework.data.elasticsearch.core.SearchHits
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -36,7 +35,7 @@ class CalendarEventController(
             days = days,
             times = times,
             branches = branches,
-            attendeeAge = attendeeAge,
+            age = attendeeAge,
             q = q
         )
     }

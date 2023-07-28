@@ -21,11 +21,10 @@ class CalendarEventService(
         days: Set<SearchConditions.Day>? = null,
         times: Set<SearchConditions.Time>? = null,
         branches: Set<SearchConditions.Branch>? = null,
-        attendeeAge: SearchConditions.AttendeeAge? = null,
+        age: SearchConditions.AttendeeAge? = null,
         q: String? = null
     ): List<CalendarEvent> {
 
-        // TODO: add recommended age
         // TODO: add tags
         // TODO: skip isDeleted == true
         // TODO: skip time.start < now
@@ -46,22 +45,22 @@ class CalendarEventService(
             query = query.must(QueryBuilders.termsQuery("location.branch", branches.map(SearchConditions.Branch::storedValue)))
         }
 
-        if (attendeeAge != null) {
-            if (attendeeAge.minYears != null) {
+        if (age != null) {
+            if (age.minYears != null) {
                 val field_not_defined =
                     QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("recommendedAge.minYears"))
                 val fiend_in_range =
-                    QueryBuilders.rangeQuery("recommendedAge.minYears").lte(attendeeAge.minYears)
+                    QueryBuilders.rangeQuery("recommendedAge.minYears").lte(age.minYears)
                 query = query.must(QueryBuilders.boolQuery()
                     .should(field_not_defined)
                     .should(fiend_in_range)
                     .minimumShouldMatch(1))
             }
-            if (attendeeAge.maxYears != null) {
+            if (age.maxYears != null) {
                 val field_not_defined =
                     QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("recommendedAge.maxYears"))
                 val fiend_in_range =
-                    QueryBuilders.rangeQuery("recommendedAge.maxYears").gte(attendeeAge.maxYears)
+                    QueryBuilders.rangeQuery("recommendedAge.maxYears").gte(age.maxYears)
                 query = query.must(QueryBuilders.boolQuery()
                     .should(field_not_defined)
                     .should(fiend_in_range)
@@ -70,7 +69,7 @@ class CalendarEventService(
         }
 
         if (! q.isNullOrBlank()) {
-            query = query.must(QueryBuilders.termQuery("content", q))
+            query = query.must(QueryBuilders.simpleQueryStringQuery(q))
         }
 
         var nativeSearchQuery = NativeSearchQueryBuilder().withQuery(query).build()

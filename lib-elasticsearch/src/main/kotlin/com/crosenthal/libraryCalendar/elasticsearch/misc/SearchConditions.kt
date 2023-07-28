@@ -78,17 +78,16 @@ object SearchConditions {
         }
     }
 
-    // categories based on: https://www.cdc.gov/ncbddd/childdevelopment/positiveparenting/index.html
     enum class AttendeeAge(val minYears: Int?, val maxYears: Int?, override val description: String): IsDescribed {
         INFANT(null, 1, "Infant (1 year and below)"),
         TODDLER(1, 3, "Toddler (ages 1-3)"),
         PRESCHOOLER(3, 5, "Preschooler (ages 3-5)"),
-        EARLY_CHILDHOOD(6, 8, "Early Childhood (ages 6-8)"),
-        MIDDLE_CHILDHOOD(9, 11, "Middle Childhood (ages 9-11)"),
+        CHILD(6, 8, "Child (ages 6-8)"),
+        PRETEEN(9, 11, "Preteen (ages 9-11)"),
         YOUNG_TEEN(12, 14, "Young Teen (ages 12-14)"),
         TEEN(15, 18, "Teen (ages 15-17)"),
-        ADULT(18, null, description = "Adult (ages 18 and up)");
-
+        YOUNG_ADULT(18, 21, description = "Young Adult (ages 18-21)"),
+        ADULT(21, null, description = "Adult (ages 21 and up)");
     }
 
 }

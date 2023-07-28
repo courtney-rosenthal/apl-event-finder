@@ -5,7 +5,7 @@ import com.crosenthal.libraryCalendar.elasticsearch.ElasticsearchProperties
 import com.crosenthal.libraryCalendar.elasticsearch.domain.CalendarEvent
 import com.crosenthal.libraryCalendar.elasticsearch.domain.EventDateTime
 import com.crosenthal.libraryCalendar.elasticsearch.domain.RecommendedAge
-import com.crosenthal.libraryCalendar.elasticsearch.misc.SearchConditions
+import com.crosenthal.libraryCalendar.elasticsearch.misc.SearchConditions.AttendeeAge
 import com.crosenthal.libraryCalendar.elasticsearch.misc.SearchConditions.Day
 import com.crosenthal.libraryCalendar.elasticsearch.misc.SearchConditions.Time
 import com.crosenthal.libraryCalendar.elasticsearch.repository.CalendarEventRepository
@@ -99,20 +99,27 @@ internal class CalendarEventService_SearchIntTest {
     }
 
     @Test
-    @Disabled("not working yet")
-    fun `search by recommendedAge`() {
+    fun `search by attendeeAge`() {
         val age_0_5 = makeEvent("age_0_5", recommendedAge = makeAge(null, 5))
         val age_0_7 = makeEvent("age_0_7", recommendedAge = makeAge(null, 7))
         val age_5_10 = makeEvent("age_5_10", recommendedAge = makeAge(5, 10))
         val age_7_up = makeEvent("age_7_up", recommendedAge = makeAge(7, null))
         val age_13_18 = makeEvent("age_13_18", recommendedAge = makeAge(13, 18))
+        val age_all = makeEvent("age_all", recommendedAge = makeAge(null, null))
 
-        // EARLY_CHILDHOOD -> ages 6 - 8
-        assertThat(service.search(attendeeAge = SearchConditions.AttendeeAge.EARLY_CHILDHOOD))
-            .containsExactlyInAnyOrder(age_0_7, age_5_10, age_7_up)
+        // CHILD -> ages 6 - 8
+        assertThat(service.search(age = AttendeeAge.CHILD)).containsExactlyInAnyOrder(age_0_7, age_5_10, age_7_up, age_all)
     }
 
+    @Test
+    fun `search content`() {
+        val a = makeEvent("a", content = "The quick brown.")
+        val b = makeEvent("b", content = "Fox jumped over.")
+        val c = makeEvent("c", content = "The lazy dog.")
 
-    // content search
+        assertThat(service.search(q = "quick")).containsExactlyInAnyOrder(a)
+        assertThat(service.search(q = "the")).containsExactlyInAnyOrder(a, c)
+        assertThat(service.search(q = "cupcakes")).isEmpty()
+    }
 
 }
