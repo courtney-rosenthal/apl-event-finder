@@ -2,9 +2,9 @@ package com.crosenthal.eventFinder.elasticsearch.service
 
 import com.crosenthal.eventFinder.elasticsearch.domain.EventDateTime
 import com.crosenthal.eventFinder.elasticsearch.domain.RecommendedAge
-import com.crosenthal.eventFinder.elasticsearch.misc.AttendeeAge
-import com.crosenthal.eventFinder.elasticsearch.misc.Day
-import com.crosenthal.eventFinder.elasticsearch.misc.Time
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.AttendeeAge
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Day
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Time
 import com.crosenthal.eventFinder.elasticsearch.repository.CalendarEventRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach

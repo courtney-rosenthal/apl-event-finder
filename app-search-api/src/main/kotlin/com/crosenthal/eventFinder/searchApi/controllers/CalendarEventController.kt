@@ -1,11 +1,11 @@
 package com.crosenthal.eventFinder.searchApi.controllers
 
 import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
-import com.crosenthal.eventFinder.elasticsearch.misc.AttendeeAge
-import com.crosenthal.eventFinder.elasticsearch.misc.Branch
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria
-import com.crosenthal.eventFinder.elasticsearch.misc.Day
-import com.crosenthal.eventFinder.elasticsearch.misc.Time
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.AttendeeAge
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Branch
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Day
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Time
 import com.crosenthal.eventFinder.elasticsearch.service.CalendarEventService
 import com.crosenthal.eventFinder.searchApi.exceptions.EntityNotFound
 import io.swagger.v3.oas.annotations.Operation

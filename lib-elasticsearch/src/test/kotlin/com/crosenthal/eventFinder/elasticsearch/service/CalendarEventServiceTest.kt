@@ -45,7 +45,6 @@ internal class CalendarEventServiceTest {
 
     @Test
     fun `findById not found`() {
-        val event = makeCalendarEvent()
         every { repository.findById(any()) } returns Optional.empty()
         val result = service.findById("bloop")
         assertThat(result).isNull()

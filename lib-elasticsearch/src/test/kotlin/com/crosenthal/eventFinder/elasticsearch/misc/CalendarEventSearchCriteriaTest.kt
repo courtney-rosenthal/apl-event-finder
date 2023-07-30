@@ -1,5 +1,8 @@
 package com.crosenthal.eventFinder.elasticsearch.misc
 
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Day
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Time
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Branch
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
