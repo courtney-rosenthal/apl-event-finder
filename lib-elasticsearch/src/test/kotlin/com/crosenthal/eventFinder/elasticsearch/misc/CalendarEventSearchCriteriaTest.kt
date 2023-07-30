@@ -1,16 +1,13 @@
 package com.crosenthal.eventFinder.elasticsearch.misc
 
-import com.crosenthal.eventFinder.elasticsearch.misc.SearchConditions.Branch
-import com.crosenthal.eventFinder.elasticsearch.misc.SearchConditions.Day
-import com.crosenthal.eventFinder.elasticsearch.misc.SearchConditions.Time
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-internal class SearchConditionsTest {
+internal class CalendarEventSearchCriteriaTest {
 
     @Test
     fun `Day storedValue`() {
-        assertThat(SearchConditions.Day.WED.storedValue()).isEqualTo("Wed")
+        assertThat(Day.WED.storedValue()).isEqualTo("Wed")
     }
 
     @Test

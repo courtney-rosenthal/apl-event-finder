@@ -1,9 +1,15 @@
 package com.crosenthal.eventFinder.elasticsearch.service
 
-import com.crosenthal.eventFinder.elasticsearch.misc.SearchConditions
+import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
+import com.crosenthal.eventFinder.elasticsearch.misc.AttendeeAge
+import com.crosenthal.eventFinder.elasticsearch.misc.Branch
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria
+import com.crosenthal.eventFinder.elasticsearch.misc.Day
+import com.crosenthal.eventFinder.elasticsearch.misc.Time
 import com.crosenthal.eventFinder.elasticsearch.repository.CalendarEventRepository
 import org.elasticsearch.index.query.QueryBuilders
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.stereotype.Service
@@ -11,19 +17,32 @@ import org.springframework.stereotype.Service
 @Service
 class CalendarEventService(
     repository: CalendarEventRepository
-) : BaseService<com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, CalendarEventRepository>(repository) {
+) : BaseService<CalendarEvent, CalendarEventRepository>(repository) {
 
     @Autowired
     lateinit var operations: ElasticsearchOperations
 
+
+
     fun search(
-        days: Set<SearchConditions.Day>? = null,
-        times: Set<SearchConditions.Time>? = null,
-        branches: Set<SearchConditions.Branch>? = null,
-        age: SearchConditions.AttendeeAge? = null,
+        days: Set<Day>? = null,
+        times: Set<Time>? = null,
+        branches: Set<Branch>? = null,
+        age: AttendeeAge? = null,
         tags: Set<String>? = null,
-        q: String? = null
-    ): List<com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent> {
+        searchText: String? = null
+    ): List<CalendarEvent> {
+        return search(CalendarEventSearchCriteria(
+            days = days,
+            times = times,
+            branches = branches,
+            age = age,
+            tags = tags,
+            searchText = searchText
+        ))
+    }
+
+    fun search(criteria: CalendarEventSearchCriteria): List<CalendarEvent> {
 
         // TODO: add tags
         // TODO: skip isDeleted == true
@@ -31,36 +50,36 @@ class CalendarEventService(
 
         var query = QueryBuilders.boolQuery()
 
-        if (! days.isNullOrEmpty()) {
-            val a = days.flatMap {it.expand()}.map {it.description }.toSet()
+        if (! criteria.days.isNullOrEmpty()) {
+            val a = criteria.days!!.flatMap {it.expand()}.map {it.description }.toSet()
             query = query.must(QueryBuilders.termsQuery("time.localDayOfWeek", a))
         }
 
-        if (! times.isNullOrEmpty()) {
-            val a = times.flatMap {it.expand()}.toSet()
+        if (! criteria.times.isNullOrEmpty()) {
+            val a = criteria.times!!.flatMap {it.expand()}.toSet()
             query = query.must(QueryBuilders.termsQuery("time.localHourOfDay", a))
         }
 
-        if (! branches.isNullOrEmpty()) {
-            query = query.must(QueryBuilders.termsQuery("location.branch", branches.map(SearchConditions.Branch::storedValue)))
+        if (! criteria.branches.isNullOrEmpty()) {
+            query = query.must(QueryBuilders.termsQuery("location.branch", criteria.branches!!.map(Branch::storedValue)))
         }
 
-        if (age != null) {
-            if (age.minYears != null) {
+        if (criteria.age != null) {
+            if (criteria.age!!.minYears != null) {
                 val field_not_defined =
                     QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("recommendedAge.maxYears"))
                 val fiend_in_range =
-                    QueryBuilders.rangeQuery("recommendedAge.maxYears").gte(age.minYears)
+                    QueryBuilders.rangeQuery("recommendedAge.maxYears").gte(criteria.age!!.minYears)
                 query = query.must(QueryBuilders.boolQuery()
                     .should(field_not_defined)
                     .should(fiend_in_range)
                     .minimumShouldMatch(1))
             }
-            if (age.maxYears != null) {
+            if (criteria.age!!.maxYears != null) {
                 val field_not_defined =
                     QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery("recommendedAge.minYears"))
                 val fiend_in_range =
-                    QueryBuilders.rangeQuery("recommendedAge.minYears").lte(age.maxYears)
+                    QueryBuilders.rangeQuery("recommendedAge.minYears").lte(criteria.age!!.maxYears)
                 query = query.must(QueryBuilders.boolQuery()
                     .should(field_not_defined)
                     .should(fiend_in_range)
@@ -68,16 +87,22 @@ class CalendarEventService(
             }
         }
 
-        if (! tags.isNullOrEmpty()) {
-            query = query.must(QueryBuilders.termsQuery("tags", tags))
+        if (! criteria.tags.isNullOrEmpty()) {
+            query = query.must(QueryBuilders.termsQuery("tags", criteria.tags))
         }
 
-        if (! q.isNullOrBlank()) {
-            query = query.must(QueryBuilders.simpleQueryStringQuery(q))
+        if (! criteria.searchText.isNullOrBlank()) {
+            query = query.must(QueryBuilders.simpleQueryStringQuery(criteria.searchText))
         }
 
-        var nativeSearchQuery = NativeSearchQueryBuilder().withQuery(query).build()
-        val hits = operations.search(nativeSearchQuery, com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent::class.java)
+        // TODO: pagination
+
+        var nativeSearchQuery = NativeSearchQueryBuilder()
+            .withQuery(query)
+            .withPageable(Pageable.ofSize(20))
+            .build()
+
+        val hits = operations.search(nativeSearchQuery, CalendarEvent::class.java)
 
         return hits.searchHits.map {it.content}
     }

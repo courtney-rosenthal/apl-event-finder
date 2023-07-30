@@ -2,9 +2,9 @@ package com.crosenthal.eventFinder.elasticsearch.service
 
 import com.crosenthal.eventFinder.elasticsearch.domain.EventDateTime
 import com.crosenthal.eventFinder.elasticsearch.domain.RecommendedAge
-import com.crosenthal.eventFinder.elasticsearch.misc.SearchConditions.AttendeeAge
-import com.crosenthal.eventFinder.elasticsearch.misc.SearchConditions.Day
-import com.crosenthal.eventFinder.elasticsearch.misc.SearchConditions.Time
+import com.crosenthal.eventFinder.elasticsearch.misc.AttendeeAge
+import com.crosenthal.eventFinder.elasticsearch.misc.Day
+import com.crosenthal.eventFinder.elasticsearch.misc.Time
 import com.crosenthal.eventFinder.elasticsearch.repository.CalendarEventRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -141,9 +141,9 @@ internal class CalendarEventService_SearchIntTest {
         val b = makeEvent("b", content = "Fox jumped over.")
         val c = makeEvent("c", content = "The lazy dog.")
 
-        assertThat(service.search(q = "quick")).containsExactlyInAnyOrder(a)
-        assertThat(service.search(q = "the")).containsExactlyInAnyOrder(a, c)
-        assertThat(service.search(q = "cupcakes")).isEmpty()
+        assertThat(service.search(searchText = "quick")).containsExactlyInAnyOrder(a)
+        assertThat(service.search(searchText = "the")).containsExactlyInAnyOrder(a, c)
+        assertThat(service.search(searchText = "cupcakes")).isEmpty()
     }
 
 }
