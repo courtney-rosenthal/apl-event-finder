@@ -4,6 +4,7 @@ defineProps(['item']);
 import dayjs from "dayjs";
 import Card from 'primevue/card';
 
+// XXX - I would have thought dayjs would do day-of-week names.
 const dayNames = [
     "Sun",
     "Mon",
@@ -20,22 +21,22 @@ function formatDate(t) {
 
 function formatTime(time) {
   const t0 = dayjs.unix(parseInt(time.start));
-  const t0_date = formatDate(t0);
-  const t0_time = t0.format("h:mm a");
-  let start = `${t0_date}, ${t0_time}`
+  const start_date = formatDate(t0);
+  const start_time = t0.format("h:mm a");
+  const start = `${start_date}, ${start_time}`
 
   if (! time.end) {
     return start;
   }
 
   const t1 = dayjs.unix(parseInt(time.end));
-  const t1_date = formatDate(t1);
-  const t1_time = t1.format("h:mm a");
+  const end_date = formatDate(t1);
+  const end_time = t1.format("h:mm a");
 
-  if (t0_date == t1_date) {
-    return `${start} - ${t1_time}`;
+  if (start_date == end_date) {
+    return `${start} - ${end_time}`;
   } else {
-    return `${start} - ${t1_date}, ${t1_time}`;
+    return `${start} - ${end_date}, ${end_time}`;
   }
 }
 </script>

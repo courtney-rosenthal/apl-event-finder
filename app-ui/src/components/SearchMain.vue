@@ -5,6 +5,7 @@ import Fieldset from 'primevue/fieldset';
 import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
+import SelectButton from 'primevue/selectbutton';
 import EventCard from './EventCard.vue';
 
 // The search criteria that will be submitted to the API.
@@ -12,7 +13,7 @@ const searchCriteria = ref({
   days: [],
   times: [],
   locations: [],
-  ages: [],
+  age: null,
   tags: [],
   searchText: null
 });
@@ -27,8 +28,8 @@ function resetSearchCriteria(whut) {
   if (whut == "locations" || whut == "all") {
     searchCriteria.value.locations = [];
   }
-  if (whut == "ages" || whut == "all") {
-    searchCriteria.value.ages = [];
+  if (whut == "age" || whut == "all") {
+    searchCriteria.value.ages = null;
   }
   if (whut == "tags" || whut == "all") {
     searchCriteria.value.tags = [];
@@ -94,7 +95,8 @@ const ages = [
   {key: "YOUNG_TEEN", label: "Young Teen (ages 12-14)"},
   {key: "TEEN", label: "Teen (ages 15-17)"},
   {key: "YOUNG_ADULT", label: "Young Adult (ages 18-21)"},
-  {key: "ADULT", label: "Adult (ages 21 and up)"}
+  {key: "ADULT", label: "Adult (ages 21 and up)"},
+  {key: null, label: "All ages"}
 ];
 
 function submit() {
@@ -153,11 +155,8 @@ function submit() {
     </Fieldset>
 
     <Fieldset legend="Age">
-      <span v-for="age in ages" :key="age.key">
-        <Checkbox name="criteria.ages" v-model="searchCriteria.ages" :inputId="age.key" :value="age.key" /><label :for="age.key">{{ age.label }}</label>
-      </span>
-      <br />
-      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('ages')" />
+      <SelectButton v-model="searchCriteria.age" :options="ages" optionLabel="label" optionValue="key" aria-labelledby="basic" />
+<!--      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('age')" />-->
     </Fieldset>
 
     <Fieldset legend="Tags">

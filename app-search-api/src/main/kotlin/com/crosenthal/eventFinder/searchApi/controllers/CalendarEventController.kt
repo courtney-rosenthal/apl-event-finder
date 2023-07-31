@@ -34,7 +34,7 @@ class CalendarEventController(
         @RequestParam days: Set<Day>?,
         @RequestParam times: Set<Time>?,
         @RequestParam branches: Set<Branch>?,
-        @RequestParam attendeeAge: AttendeeAge?,
+        @RequestParam age: AttendeeAge?,
         @RequestParam tags: Set<String>?,
         @RequestParam searchText: String?
     ) : List<CalendarEvent> {
@@ -42,7 +42,7 @@ class CalendarEventController(
             days = days,
             times = times,
             branches = branches,
-            age = attendeeAge,
+            age = age,
             tags = tags ?: emptySet(),
             searchText = searchText ?: ""
         )
