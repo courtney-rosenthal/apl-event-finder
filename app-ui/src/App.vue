@@ -1,9 +1,9 @@
 <script setup>
-  import SearchEvents from "./components/SearchEvents.vue";
+  import SearchMain from "./components/SearchMain.vue";
 </script>
 
 <template>
-  <SearchEvents />
+  <SearchMain />
 </template>
 
 <style scoped>

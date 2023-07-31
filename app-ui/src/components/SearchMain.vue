@@ -1,13 +1,45 @@
 <script setup>
 import { ref } from 'vue';
-import dayjs from "dayjs";
-
-import Panel from "primevue/panel";
+import Panel from 'primevue/panel';
 import Fieldset from 'primevue/fieldset';
 import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
-import Card from 'primevue/card';
+import EventCard from './EventCard.vue';
+
+// The search criteria that will be submitted to the API.
+const searchCriteria = ref({
+  days: [],
+  times: [],
+  locations: [],
+  ages: [],
+  tags: [],
+  searchText: null
+});
+
+function resetSearchCriteria(whut) {
+  if (whut == "days" || whut == "all") {
+    searchCriteria.value.days = [];
+  }
+  if (whut == "times" || whut == "all") {
+    searchCriteria.value.times = [];
+  }
+  if (whut == "locations" || whut == "all") {
+    searchCriteria.value.locations = [];
+  }
+  if (whut == "ages" || whut == "all") {
+    searchCriteria.value.ages = [];
+  }
+  if (whut == "tags" || whut == "all") {
+    searchCriteria.value.tags = [];
+  }
+  if (whut == "all") {
+    searchCriteria.value.searchText = null;
+  }
+}
+
+// The search results to display.
+const searchResults = ref([])
 
 const days = [
   {key: "MON", label: "Mon"},
@@ -19,7 +51,6 @@ const days = [
   {key: "WEEKDAY", label: "Weekday"},
   {key: "WEEKEND", label: "Weekend"},
 ];
-
 
 const times = [
   {key: "MORNING", label: "Morning"},
@@ -66,24 +97,16 @@ const ages = [
   {key: "ADULT", label: "Adult (ages 21 and up)"}
 ];
 
-const criteria = ref({
-  days: [],
-  times: [],
-  locations: [],
-  ages: [],
-  tags: [],
-  searchText: null
-});
-
 function submit() {
   const request = {
     method: "POST",
-    body: JSON.stringify(criteria.value),
+    body: JSON.stringify(searchCriteria.value),
     headers: {
       "Content-type": "application/json; charset=UTF-8"
     }
   };
 
+  // TODO: externalize base URL to config
   fetch("http://localhost:8080/api/calendarEvent/search", request)
     .then((response) => {
       if (!response.ok) {
@@ -93,52 +116,11 @@ function submit() {
       }
       return response.json()
     }).then((content) => {
-      console.log(content);
       searchResults.value = content;
     }).catch((ex) => {
+      // TODO: do something better with the error
       alert(ex)
     })
-}
-
-const searchResults = ref([])
-
-const dayNames = [
-    "Sun",
-    "Mon",
-    "Tue",
-    "Wed",
-    "Thu",
-    "Fri",
-    "Sat"
-]
-
-function formatDate(t) {
-  return dayNames[t.day()] + ", " + t.format("MMM D");
-}
-
-function formatTime(time) {
-  const t0 = dayjs.unix(parseInt(time.start));
-  const t0_date = formatDate(t0);
-  const t0_time = t0.format("h:mm a");
-  let start = `${t0_date}, ${t0_time}`
-
-  if (! time.end) {
-    return start;
-  }
-
-  const t1 = dayjs.unix(parseInt(time.end));
-  const t1_date = formatDate(t1);
-  const t1_time = t1.format("h:mm a");
-
-  if (t0_date == t1_date) {
-    return `${start} - ${t1_time}`;
-  } else {
-    return `${start} - ${t1_date}, ${t1_time}`;
-  }
-}
-
-function foob(thingy) {
-  alert(thingy);
 }
 
 </script>
@@ -148,34 +130,34 @@ function foob(thingy) {
 
     <Fieldset legend="Day">
       <span v-for="day in days" :key="day.key">
-        <Checkbox name="criteria.days" v-model="criteria.days" :inputId="day.key" :value="day.key" /><label :for="day.key">{{ day.label }}</label>
+        <Checkbox name="criteria.days" v-model="searchCriteria.days" :inputId="day.key" :value="day.key" /><label :for="day.key">{{ day.label }}</label>
       </span>
       <br />
-      <Button class="clear" label="clear choices" link @click="() => {criteria.days = [];}" />
+      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('days')" />
     </Fieldset>
 
     <Fieldset legend="Time">
       <span v-for="time in times" :key="time.key">
-        <Checkbox name="criteria.times" v-model="criteria.times" :inputId="time.key" :value="time.key" /><label :for="time.key">{{ time.label }}</label>
+        <Checkbox name="criteria.times" v-model="searchCriteria.times" :inputId="time.key" :value="time.key" /><label :for="time.key">{{ time.label }}</label>
       </span>
       <br />
-      <Button class="clear" label="clear choices" link @click="() => {criteria.times = [];}" />
+      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('times')" />
     </Fieldset>
 
     <Fieldset legend="Location">
       <span v-for="location in locations" :key="location.key">
-        <Checkbox name="criteria.locations" v-model="criteria.locations" :inputId="location.key" :value="location.key" /><label :for="location.key">{{ location.label }}</label>
+        <Checkbox name="criteria.locations" v-model="searchCriteria.locations" :inputId="location.key" :value="location.key" /><label :for="location.key">{{ location.label }}</label>
       </span>
       <br />
-      <Button class="clear" label="clear choices" link @click="() => {criteria.locations = [];}" />
+      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('locations')" />
     </Fieldset>
 
     <Fieldset legend="Age">
       <span v-for="age in ages" :key="age.key">
-        <Checkbox name="criteria.ages" v-model="criteria.ages" :inputId="age.key" :value="age.key" /><label :for="age.key">{{ age.label }}</label>
+        <Checkbox name="criteria.ages" v-model="searchCriteria.ages" :inputId="age.key" :value="age.key" /><label :for="age.key">{{ age.label }}</label>
       </span>
       <br />
-      <Button class="clear" label="clear choices" link @click="() => {criteria.ages = [];}" />
+      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('ages')" />
     </Fieldset>
 
     <Fieldset legend="Tags">
@@ -183,30 +165,19 @@ function foob(thingy) {
       Picker widget for tags goes here.
     </Fieldset>
 
-
     <Fieldset legend="Words or phrases to find">
-      <InputText type="text" v-model="criteria.searchText" />
+      <InputText type="text" v-model="searchCriteria.searchText" />
     </Fieldset>
 
     <div>
-    <Button label="Search!" @click="submit" />
+      <Button label="Search!" @click="submit" />
+      <Button class="clear" label="clear all choices" link @click="resetSearchCriteria('all')" />
     </div>
 
   </Panel>
 
   <Panel header="Events found ...">
-    <div v-for="item in searchResults">
-      <Card>
-        <template #title>
-          <a :href="item.url">{{ item.title }}</a>
-        </template>
-        <template #content>
-          <p>{{ item.summary }}</p>
-          <p>{{ item.location }}</p>
-          <p>{{ formatTime(item.time) }}</p>
-        </template>
-      </Card>
-    </div>
+    <EventCard v-for="item in searchResults" :item="item" />
   </Panel>
 
 </template>
