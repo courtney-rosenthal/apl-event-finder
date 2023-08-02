@@ -22,8 +22,6 @@ class CalendarEventService(
     @Autowired
     lateinit var operations: ElasticsearchOperations
 
-
-
     fun search(
         days: Set<Day>? = null,
         times: Set<Time>? = null,

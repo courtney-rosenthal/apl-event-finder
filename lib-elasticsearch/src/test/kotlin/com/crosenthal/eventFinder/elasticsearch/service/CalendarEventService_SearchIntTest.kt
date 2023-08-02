@@ -1,5 +1,7 @@
 package com.crosenthal.eventFinder.elasticsearch.service
 
+import com.crosenthal.eventFinder.elasticsearch.TestUtil
+import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
 import com.crosenthal.eventFinder.elasticsearch.domain.EventDateTime
 import com.crosenthal.eventFinder.elasticsearch.domain.RecommendedAge
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.AttendeeAge
@@ -40,16 +42,15 @@ internal class CalendarEventService_SearchIntTest {
         time: EventDateTime? = null,
         recommendedAge: RecommendedAge? = null,
         tags: Set<String> = emptySet(),
-    ): com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent {
-        return repository.save(
-            com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent(
-                url = url,
-                content = content,
-                time = time,
-                recommendedAge = recommendedAge,
-                tags = tags,
-            )
+    ): CalendarEvent {
+        val event = TestUtil.makeEvent(
+            url = url,
+            content = content,
+            time = time,
+            recommendedAge = recommendedAge,
+            tags = tags
         )
+        return repository.save(event)
     }
 
     private fun makeTime(date: String = "2023-01-01", startTime: String = "12:00", endTime: String = "13:00"): EventDateTime {

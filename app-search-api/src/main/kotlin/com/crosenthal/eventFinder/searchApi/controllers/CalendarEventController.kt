@@ -25,7 +25,7 @@ class CalendarEventController(
     @GetMapping
     @Operation(summary = "Retrieve a single event by URL")
     fun get(@RequestParam url: String): CalendarEvent {
-        return service.findById(url) ?: throw EntityNotFound()
+        return service.repository.findById(url).orElseThrow{ EntityNotFound() }
     }
 
     @GetMapping("/search")

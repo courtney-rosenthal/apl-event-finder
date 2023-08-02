@@ -1,5 +1,6 @@
 package com.crosenthal.eventFinder.scraper.service
 
+import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
 import com.crosenthal.eventFinder.elasticsearch.domain.ScrapeIssues
 import com.crosenthal.eventFinder.scraper.util.getRootMessage
 import org.fissore.slf4j.FluentLoggerFactory
@@ -22,6 +23,7 @@ class EventScraper(
     companion object {
         val LOG = FluentLoggerFactory.getLogger(EventScraper::class.java)
 
+        // Get the CSS selector string for a node and trim it to its final component
         private val selectorLeader = ".* > ".toRegex()
         fun getBriefSelector(n: Node) = if (n is Element) n.cssSelector().replace(selectorLeader, "") else null
     }
@@ -53,8 +55,7 @@ class EventScraper(
 
 
     fun List<String>.collate(): String? {
-        return if (this.size > 0) this.joinToString("\n") else null
-
+        return if (this.size > 0) this.map { it.trim() }.joinToString("\n") else null
     }
 
     fun Node.singleTextNode(node: Node, issues: ScrapeIssues, isOptional: Boolean = false): String? {
@@ -88,8 +89,10 @@ class EventScraper(
     // ======================================================================
 
     internal fun extractLocation(element: Element, issues: ScrapeIssues): String? {
-        // TODO: fully implement location
-       return element.collectText().collate()
+       val detail = element.collectText()
+           .filter { it != "place"}     // filter out the event icon
+           .collate()
+        return detail
     }
 
     internal fun extractRegistration(element: Element, issues: ScrapeIssues): String? {
@@ -148,21 +151,21 @@ class EventScraper(
     }
 
 
-    private val fieldHandlers = mapOf<String, (Element, com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, ScrapeIssues) -> Unit>(
+    private val fieldHandlers = mapOf<String, (Element, CalendarEvent.Builder, ScrapeIssues) -> Unit>(
 
-        "div.field-title" to { element: Element, event: com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, issues: ScrapeIssues ->
+        "div.field-title" to { element: Element, event: CalendarEvent.Builder, issues: ScrapeIssues ->
             event.title = element.singleTextNode(element, issues)
         },
 
-        "div.event_subtitle" to  { element: Element, event: com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, issues: ScrapeIssues ->
+        "div.event_subtitle" to  { element: Element, event: CalendarEvent.Builder, issues: ScrapeIssues ->
             event.subTitle = element.singleTextNode(element, issues, isOptional = true)
         },
 
-        "div.apl-event-summary" to  { element: Element, event: com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, _: ScrapeIssues ->
+        "div.apl-event-summary" to  { element: Element, event: CalendarEvent.Builder, _: ScrapeIssues ->
             event.summary = element.collectText().collate()
         },
 
-        "div.apl-rec-age" to  { element: Element, event: com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, issues: ScrapeIssues ->
+        "div.apl-rec-age" to  { element: Element, event: CalendarEvent.Builder, issues: ScrapeIssues ->
             val txt = element.singleTextNode(element, issues)
             if (txt != null) {
                 try {
@@ -173,7 +176,7 @@ class EventScraper(
             }
         },
 
-        "div.field-event-time" to  { element: Element, event: com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, issues: ScrapeIssues ->
+        "div.field-event-time" to  { element: Element, event: CalendarEvent.Builder, issues: ScrapeIssues ->
             val txt = element.removeChildrenByTag(listOf("i")).collectText().singleTextNode(element, issues)
             if (txt != null) {
                 try {
@@ -184,38 +187,32 @@ class EventScraper(
             }
         },
 
-        "div.field-event-loc" to  { element: Element, event: com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, issues: ScrapeIssues ->
+        "div.field-event-loc" to  { element: Element, event: CalendarEvent.Builder, issues: ScrapeIssues ->
             event.location = extractLocation(element, issues)
         },
 
-        "div.field-event-reg" to  { element: Element, event: com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, issues: ScrapeIssues ->
+        "div.field-event-reg" to  { element: Element, event: CalendarEvent.Builder, issues: ScrapeIssues ->
             event.registrationUrl = extractRegistration(element, issues)
         },
 
-        "div.apl-free" to  { element: Element, event: com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, issues: ScrapeIssues ->
+        "div.apl-free" to  { element: Element, event: CalendarEvent.Builder, issues: ScrapeIssues ->
             event.isFree = extractIsFree(element, issues)
         },
 
-        "div.apl-event-tags" to  { element: Element, event: com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, issues: ScrapeIssues ->
+        "div.apl-event-tags" to  { element: Element, event: CalendarEvent.Builder, issues: ScrapeIssues ->
             event.tags = extractTags(element, issues)
         },
 
     ) // end of fieldHandlers
 
 
-    fun scrapeToEvent(doc: Document, url: String) : Pair<com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent, ScrapeIssues> {
+    fun scrapeToEvent(doc: Document, url: String) : Pair<CalendarEvent?, ScrapeIssues> {
 
         LOG.debug().log("scrapeToEvent: entered, url = {}", url)
 
-        val eventSource = let {
-            val a = doc.select("div.apl-event")
-            if (a.size != 1) {
-                throw IllegalArgumentException("failed to locate event in page")
-            }
-            a.first()!!
-        }
+        val eventSource = doc.select("div.apl-event").firstOrNull() ?: throw IllegalArgumentException("failed to locate \"apl-event\"")
 
-        val event = com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent(url, eventSource.html())
+        val eventBuilder = CalendarEvent.Builder(url, eventSource.html())
 
         val issues = ScrapeIssues(url, eventSource.html())
 
@@ -229,8 +226,10 @@ class EventScraper(
                 continue
             }
 
+            // we expect that the direct children of the event Node will be Element (or empty TextNode, handled above)
             if (node !is Element) {
-                throw IllegalStateException("don't know what to do with this node: " + node)
+                issues.add("unsure what to do with this node", "dropped", node)
+                continue
             }
 
             val selector = getBriefSelector(node)!!
@@ -241,26 +240,20 @@ class EventScraper(
 
             val handler = fieldHandlers[selector]
             if (handler == null) {
-                // Don't have a handler for this node, so save it off for now.
+                // Don't have a handler for this node, so assume it's event description. Save it off for later.
                 unusedNodes.add(node)
                 continue
             }
 
-            handler(node, event, issues)
+            handler(node, eventBuilder, issues)
         }
 
         // Throw whatever was not consumed into the description.
-        event.description = unusedNodes.map {it.outerHtml()}.joinToString("\n")
+        eventBuilder.description = unusedNodes.map { it.outerHtml() }.joinToString("\n")
 
-        try {
-            event.checkRequiredFields()
-        } catch (ex: IllegalStateException) {
-            issues.add(ex.getRootMessage(), "ignored", null)
-        }
-
+        val event =  eventBuilder.build(issues)
         if (issues.hasIssues) {
             LOG.warn().log("scrapeToEvent: issues found with document url={}", url)
-
         }
         return Pair(event, issues)
     }

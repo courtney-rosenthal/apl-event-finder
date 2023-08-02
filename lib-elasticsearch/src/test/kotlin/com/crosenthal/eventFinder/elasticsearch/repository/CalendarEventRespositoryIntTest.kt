@@ -1,5 +1,6 @@
 package com.crosenthal.eventFinder.elasticsearch.repository
 
+import com.crosenthal.eventFinder.elasticsearch.TestUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,9 +15,6 @@ class CalendarEventRespositoryIntTest {
     @Autowired
     lateinit var repository: CalendarEventRepository
 
-    private val URL = "http://example.com/document.html"
-    private val CONTENT = "<div>the quick brown fox</div>"
-
     @BeforeEach
     fun setup() {
         repository.deleteAll()
@@ -24,18 +22,17 @@ class CalendarEventRespositoryIntTest {
 
     @Test
     fun save() {
-        assertThat(repository.findById(URL)).isEmpty
+        val event0 = TestUtil.makeEvent()
+        assertThat(repository.findById(event0.url)).isEmpty
 
-        val event = repository.save(
-            com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent(
-                url = URL,
-                content = CONTENT
-            )
-        )
+        val event = repository.save(event0)
+        assertThat(event)
+            .usingRecursiveComparison()
+            .ignoringFields("timestamp")
+            .isEqualTo(event0)
 
-        val result = repository.findById(URL)
-        assertThat(result).isNotEmpty
-        assertThat(result.get()).isEqualTo(event)
+        val result = repository.findById(event.url)
+        assertThat(result.get()).usingRecursiveComparison().isEqualTo(event)
     }
 
 }

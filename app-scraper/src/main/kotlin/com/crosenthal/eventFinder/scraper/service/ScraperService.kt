@@ -25,15 +25,21 @@ class ScraperService(
     fun scrapeAndSaveOneLink(url: String) {
         val doc = eventScraper.loadDocumentFromUrl(url)
         val (event, issues) = eventScraper.scrapeToEvent(doc, url)
-        calendarEventService.save(event)
-        scrapeIssuesService.save(issues)
+        if (event != null) {
+            calendarEventService.repository.save(event)
+        }
+        if (issues.hasIssues) {
+            scrapeIssuesService.repository.save(issues)
+        } else {
+            scrapeIssuesService.repository.deleteById(issues.url)
+        }
         LOG.debug().log("scrapeAndSaveOneLink: saved event url={}", url)
     }
 
     fun performFullSrapeAndSave() {
         LOG.info().log("performScrape: starting")
         eventsFeed.extractLinksFromFeed(URL(config.eventsRss))
-            //.take(10)
+            //.take(10) // FIXME - make this a config
             .forEach {
                 scrapeAndSaveOneLink(it)
             }

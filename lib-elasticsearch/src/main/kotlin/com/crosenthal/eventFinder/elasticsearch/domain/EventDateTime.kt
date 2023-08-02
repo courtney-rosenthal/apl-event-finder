@@ -8,6 +8,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.TextStyle
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 data class EventDateTime(
@@ -28,8 +29,8 @@ data class EventDateTime(
 
         fun of(date: LocalDate, startTime: LocalTime, endTime: LocalTime?): EventDateTime {
             return EventDateTime(
-                start = makeInstant(date, startTime),
-                end = if (endTime == null) null else makeInstant(date, endTime),
+                start = makeInstant(date, startTime).truncatedTo(ChronoUnit.MILLIS),
+                end = if (endTime == null) null else makeInstant(date, endTime).truncatedTo(ChronoUnit.MILLIS),
                 localHourOfDay = startTime.hour,
                 localDayOfWeek = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.US)
             )

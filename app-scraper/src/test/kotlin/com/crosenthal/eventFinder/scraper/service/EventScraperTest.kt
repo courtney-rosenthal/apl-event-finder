@@ -1,5 +1,6 @@
 package crosenthal.com.eventFinder.scraper.service
 
+import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
 import com.crosenthal.eventFinder.elasticsearch.domain.EventDateTime
 import com.crosenthal.eventFinder.elasticsearch.domain.RecommendedAge
 import com.crosenthal.eventFinder.scraper.service.DateTimeParsers
@@ -7,6 +8,7 @@ import com.crosenthal.eventFinder.scraper.service.EventScraper
 import crosenthal.com.eventFinder.scraper.testHelpers.TEST_URL
 import crosenthal.com.eventFinder.scraper.testHelpers.openTestDocument
 import crosenthal.com.eventFinder.scraper.testHelpers.streamTestDocumentsIndex
+import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,11 +27,8 @@ internal class EventScraperTest {
 
     @Test
     fun `process a single event`() {
-        val doc = scraper.loadDocumentFromStream(openTestDocument(), TEST_URL)
-        val (event, issues) = scraper.scrapeToEvent(doc, TEST_URL)
-        assertThat(issues.hasIssues)
 
-        val expected =  com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent(
+        val expected =  CalendarEvent.Builder(
             url = TEST_URL,
             content = "-- ignored --"
         ).apply {
@@ -44,17 +43,21 @@ internal class EventScraperTest {
                 localHourOfDay = 19,
                 localDayOfWeek = "Wed",
             )
-            location = "place\nBetter Half Coffee\n406 Walsh St."
+            location = "Better Half Coffee\n406 Walsh St."
             registrationUrl = "https://www.eventbrite.com/e/graphic-novel-book-club-batman-and-robin-by-grant-morrison-tickets-644454941077"
             isFree = true
             tags = setOf("Adult", "Graphic Novel Book Club")
-        }
+        }.build(mockk())!!
 
+        val doc = scraper.loadDocumentFromStream(openTestDocument(), TEST_URL)
+        val (event, issues) = scraper.scrapeToEvent(doc, TEST_URL)
+        assertThat(event).isNotNull
+        assertThat(issues.hasIssues).isFalse()
         assertThat(event)
             .usingRecursiveComparison()
             .ignoringFields("content", "timestamp")
             .isEqualTo(expected)
-        assertThat(event.content).startsWith("<div class=\"field-title\">")
+        assertThat(event!!.content).startsWith("<div class=\"field-title\">")
     }
 
 
@@ -66,8 +69,9 @@ internal class EventScraperTest {
                 val doc = scraper.loadDocumentFromStream(inStream, url)
                 scraper.scrapeToEvent(doc, url)
             }
-            assertThat(event.url).isEqualTo(url)
+            assertThat(event).isNotNull
             assertThat(issues.hasIssues).isFalse()
+            assertThat(event!!.url).isEqualTo(url)
         }
     }
 
