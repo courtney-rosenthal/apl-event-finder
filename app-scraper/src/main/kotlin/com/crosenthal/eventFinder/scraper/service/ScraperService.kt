@@ -36,10 +36,10 @@ class ScraperService(
         LOG.debug().log("scrapeAndSaveOneLink: saved event url={}", url)
     }
 
-    fun performFullSrapeAndSave() {
+    fun performFullSrapeAndSave(maxScrape: Int?) {
         LOG.info().log("performScrape: starting")
         eventsFeed.extractLinksFromFeed(URL(config.eventsRss))
-            //.take(10) // FIXME - make this a config
+            .take(maxScrape ?: 999)
             .forEach {
                 scrapeAndSaveOneLink(it)
             }

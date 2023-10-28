@@ -10,5 +10,5 @@ import org.springframework.context.annotation.Configuration
 open class ApplicationProperties {
     var eventsRss: String = "https://library.austintexas.gov/events-feed.xml"
     var coerceToHttps: Boolean = true
-    var maxPagesScraped: Int = 10
+    val maxEventsToScrape: Int? = 10
 }
