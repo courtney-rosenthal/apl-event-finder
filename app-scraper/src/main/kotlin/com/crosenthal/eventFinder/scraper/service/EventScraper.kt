@@ -1,7 +1,9 @@
 package com.crosenthal.eventFinder.scraper.service
 
 import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
+import com.crosenthal.eventFinder.elasticsearch.domain.EventLocation
 import com.crosenthal.eventFinder.elasticsearch.domain.ScrapeIssues
+import com.crosenthal.eventFinder.locations.LocationService
 import com.crosenthal.eventFinder.scraper.util.getRootMessage
 import org.fissore.slf4j.FluentLoggerFactory
 import org.jsoup.Jsoup
@@ -17,7 +19,8 @@ import java.io.InputStream
  */
 @Service
 class EventScraper(
-    val dateTimeParsers: DateTimeParsers
+    val dateTimeParsers: DateTimeParsers,
+    val locationService: LocationService
 ) {
 
     companion object {
@@ -88,11 +91,16 @@ class EventScraper(
     // field-specific scraping
     // ======================================================================
 
-    internal fun extractLocation(element: Element, issues: ScrapeIssues): String? {
+    internal fun extractLocation(element: Element, issues: ScrapeIssues): EventLocation {
        val detail = element.collectText()
            .filter { it != "place"}     // filter out the event icon
            .collate()
-        return detail
+           ?: let {
+               issues.add("could not extract location", "continuing with unknown location", element.html())
+               "(location unknown)"
+           }
+        val key = locationService.findLocationKey(detail)
+        return EventLocation(key = key, detail = detail)
     }
 
     internal fun extractRegistration(element: Element, issues: ScrapeIssues): String? {

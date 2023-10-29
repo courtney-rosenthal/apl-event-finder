@@ -2,7 +2,9 @@ package crosenthal.com.eventFinder.scraper.service
 
 import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
 import com.crosenthal.eventFinder.elasticsearch.domain.EventDateTime
+import com.crosenthal.eventFinder.elasticsearch.domain.EventLocation
 import com.crosenthal.eventFinder.elasticsearch.domain.RecommendedAge
+import com.crosenthal.eventFinder.locations.LocationService
 import com.crosenthal.eventFinder.scraper.service.DateTimeParsers
 import com.crosenthal.eventFinder.scraper.service.EventScraper
 import crosenthal.com.eventFinder.scraper.testHelpers.TEST_URL
@@ -18,11 +20,14 @@ internal class EventScraperTest {
 
     private lateinit var scraper: EventScraper
     private lateinit var dateTimeParsers: DateTimeParsers
+    private lateinit var locationService: LocationService
 
     @BeforeEach
     fun setup() {
         dateTimeParsers = DateTimeParsers()
-        scraper = EventScraper(dateTimeParsers)
+        locationService = LocationService()
+        locationService.initialize()
+        scraper = EventScraper(dateTimeParsers, locationService)
     }
 
     @Test
@@ -43,7 +48,7 @@ internal class EventScraperTest {
                 localHourOfDay = 19,
                 localDayOfWeek = "Wed",
             )
-            location = "Better Half Coffee\n406 Walsh St."
+            location = EventLocation(key = null, detail = "Better Half Coffee\n406 Walsh St.")
             registrationUrl = "https://www.eventbrite.com/e/graphic-novel-book-club-batman-and-robin-by-grant-morrison-tickets-644454941077"
             isFree = true
             tags = setOf("Adult", "Graphic Novel Book Club")

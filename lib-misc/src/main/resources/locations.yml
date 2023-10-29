@@ -1,0 +1,65 @@
+- key: ACE
+  name: Central Library
+
+- key: ACB
+  name: Carver Branch
+
+- key: ACP
+  name: Cepeda Branch
+
+- key: AOK
+  name: Hampton Branch at Oak Hill
+
+- key: AHO
+  name: Howson Branch
+
+- key: ALW
+  name: Little Walnut Creek Branch
+
+- key: AMR
+  name: Menchaca Road Branch
+
+- key: AMI
+  name: Milwood Branch
+
+- key: ANV
+  name: North Village Branch
+
+- key: AOQ
+  name: Old Quarry Branch
+
+- key: APH
+  name: Pleasant Hill Branch
+
+- key: ARZ
+  name: Ruiz Branch
+
+- key: ASJ
+  name: St. John Branch
+
+- key: ASE
+  name: Southeast Branch
+
+- key: ASR
+  name: Spicewood Springs Branch
+
+- key: ATB
+  name: Terrazas Branch
+
+- key: ATO
+  name: Twin Oaks Branch
+
+- key: AUH
+  name: University Hills Branch
+
+- key: AWK
+  name: Willie Mae Kirk Branch
+
+- key: AWP
+  name: Windsor Park Branch
+
+- key: AYB
+  name: Yarborough Branch
+
+- key: ONLINE
+  name: Online Event

@@ -36,11 +36,8 @@ data class CalendarEvent(
     @Field(type = FieldType.Object)
     val time: EventDateTime,
 
-//    @Field(type = FieldType.Object)
-//    val location: EventLocation,
-
-    @Field(type = FieldType.Text, store = true)
-    val location: String,
+    @Field(type = FieldType.Object)
+    val location: EventLocation,
 
     @Field(type = FieldType.Keyword, ignoreAbove = 512)
     val registrationUrl: String?,
@@ -64,8 +61,7 @@ data class CalendarEvent(
             var description: String? = null
             var recommendedAge: RecommendedAge? = null
             var time: EventDateTime? = null
-//            var location: EventLocation
-            var location: String? = null
+            var location: EventLocation? = null
             var registrationUrl: String? = null
             var isFree: Boolean? = null
             var tags: Set<String>? = null

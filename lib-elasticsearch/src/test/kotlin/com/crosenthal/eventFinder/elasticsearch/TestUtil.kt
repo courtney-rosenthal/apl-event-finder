@@ -2,6 +2,7 @@ package com.crosenthal.eventFinder.elasticsearch
 
 import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
 import com.crosenthal.eventFinder.elasticsearch.domain.EventDateTime
+import com.crosenthal.eventFinder.elasticsearch.domain.EventLocation
 import com.crosenthal.eventFinder.elasticsearch.domain.RecommendedAge
 import io.mockk.mockk
 import java.time.LocalDate
@@ -14,7 +15,7 @@ object TestUtil {
     val EVENT_TITLE = "Event Title"
     val EVENT_DESCRIPTION = "Event description."
     val EVENT_TIME = EventDateTime.of(date = LocalDate.now(), startTime = LocalTime.now(), endTime = null)
-    val EVENT_LOCATION = "Event location"
+    val EVENT_LOCATION = EventLocation(key = "ACE", detail = "Central Library")
 
 
     fun makeEvent(
@@ -24,7 +25,7 @@ object TestUtil {
         title: String? = null,
         description: String? = null,
         time: EventDateTime? = null,
-        location: String? = null,
+        location: EventLocation? = null,
         // optional fields in the CalendarEvent
         recommendedAge: RecommendedAge? = null,
         tags: Set<String> = emptySet(),
