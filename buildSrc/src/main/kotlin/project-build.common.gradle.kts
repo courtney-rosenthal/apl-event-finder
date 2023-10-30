@@ -2,14 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 	kotlin("jvm")
-//	kotlin("plugin.spring") // version "1.6.21"
 	id("org.springframework.boot")
 	id("io.spring.dependency-management")
 }
 
 dependencies {
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-//	implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
 	implementation("com.google.guava:guava:32.1.1-jre")

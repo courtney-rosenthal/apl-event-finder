@@ -1,5 +1,6 @@
 plugins {
 	id("project-build.common")
+	id("project-build.docker")
 }
 
 dependencies {
