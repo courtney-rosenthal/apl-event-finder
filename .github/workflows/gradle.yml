@@ -9,9 +9,9 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main", "courtney-rosenthal-patch-1" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "courtney-rosenthal-patch-1" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -44,6 +44,7 @@ jobs:
     #     arguments: build
 
     - name: Save test results
+      if: success() || failure()
       uses: actions/upload-artifact@v3.1.3
       with:
         path: |
