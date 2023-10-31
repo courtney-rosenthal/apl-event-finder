@@ -13,6 +13,7 @@
 * app-scraper - add config to force https
 * app-search-api - add pagination (backend)
 * app-ui - add pagination (frontend)
+* app-scraper - move localZoneId to config
 
 ## Future Tasks
 * move form content out of app-ui into a service
