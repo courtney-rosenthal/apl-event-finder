@@ -36,7 +36,10 @@ data class EventDateTime(
             )
         }
 
-        private fun makeInstant(date: LocalDate, time: LocalTime, zone: ZoneId = ZoneId.systemDefault()): Instant {
+        // FIXME: move this to config
+        private val localZoneId =  ZoneId.of("America/Chicago")
+
+        private fun makeInstant(date: LocalDate, time: LocalTime, zone: ZoneId = localZoneId): Instant {
             return ZonedDateTime.of(date, time, zone).toInstant()
         }
 
