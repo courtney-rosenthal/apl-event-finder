@@ -3,7 +3,7 @@
 This application provides advanced search capability and notifications
 for Austin Public Library events.
 
-STATUS: in development
+STATUS: in development (see the [TODO.md]() file for current issues)
 
 This application scrapes the APL event calendar
 (https://library.austintexas.gov/events) into a searchable index. The 
@@ -17,9 +17,8 @@ There are four microservices in this project:
 * (TBD: Service to manage notifications)
 * app-ui -- Front end application
 
-STATUS: The _app-scraper_ and _app-search-api_ services have MVP 
-implementations. Next step is the _app-ui_ MVP. See the TODO.md document for 
-short-term development plans.
+STATUS: The three listed services currently have MVP implementations.
+See the TODO.md document for short-term development plans.
 
 ## Development Setup
 
@@ -27,7 +26,8 @@ The microservices are coded in Kotlin using Spring Boot. The Gradle build
 system is used.
 
 At this time the only additional service required is Elasticserach. A 
-_docker-compose.yml_ file starts the services needed for development and test.
+_dev/docker-compose.yml_ file starts the services needed for development and 
+test.
 
 Here is the bring-up procedure on a new (Linux) host:
 
@@ -35,7 +35,7 @@ Here is the bring-up procedure on a new (Linux) host:
 * Install _docker.io_ and _docker-compose_
 * Install openjdk-17-jdk (I also installed _doc_ and _source_ packages)
 * Do build (without tests): ./gradlew clean build -x check
-* Start services: docker-compose up
+* Start services: docker-compose -f dev/docker-compose.yml up
 * Run tests: ./gradlew check
 * Start API service: java -jar app-search-api/build/libs/app-search-api-*.jar
   * FIXME: get "no main manifest attribute" when doing this (for now, I'll 
@@ -48,11 +48,6 @@ Here is the bring-up procedure on a new (Linux) host:
   * cd app-ui
   * npm install
   * npm run dev
-
-
-* Download and install IntelliJ IDEA: https://www.jetbrains.com/idea/download/
-* Open this project in IntelliJ, wait for it to complete the import
-* 
 
 Command line directions for build and test:
 

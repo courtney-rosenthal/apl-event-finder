@@ -1,7 +1,7 @@
 # To Do
 
 ## Current Tasks
-* finish implementing location
+* finish implementing location (verify search works)
 * app-scraper - cleanup EventScraper
 * figure out why logging (e.g. Elasticsearch loggers) isn't working
 
