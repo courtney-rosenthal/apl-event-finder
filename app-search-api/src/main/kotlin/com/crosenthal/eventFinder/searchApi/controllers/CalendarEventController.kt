@@ -52,4 +52,12 @@ class CalendarEventController(
     fun search(@RequestBody criteria: CalendarEventSearchCriteria) : List<CalendarEvent> {
         return service.search(criteria)
     }
+
+
+    @GetMapping("/tags")
+    @Operation(summary = "Return list of known tags")
+    fun tags() : List<String> {
+        return service.listTags()
+    }
+
 }

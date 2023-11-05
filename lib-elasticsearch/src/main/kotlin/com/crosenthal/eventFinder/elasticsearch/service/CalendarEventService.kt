@@ -7,6 +7,10 @@ import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Time
 import com.crosenthal.eventFinder.elasticsearch.repository.CalendarEventRepository
 import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.search.aggregations.AggregationBuilders
+import org.elasticsearch.search.aggregations.Aggregations
+import org.elasticsearch.search.aggregations.BucketOrder
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Pageable
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
@@ -102,5 +106,18 @@ class CalendarEventService(
         val hits = operations.search(nativeSearchQuery, CalendarEvent::class.java)
 
         return hits.searchHits.map {it.content}
+    }
+
+    fun listTags(): List<String> {
+        val nativeSearchQuery = NativeSearchQueryBuilder()
+            .withQuery(QueryBuilders.matchAllQuery())
+            .withAggregations(AggregationBuilders.terms("tags").field("tags").size(Int.MAX_VALUE).order(BucketOrder.key(true)))
+            .build()
+
+        nativeSearchQuery.setMaxResults(9999)
+        val hits = operations.search(nativeSearchQuery, CalendarEvent::class.java)
+        val a = hits.aggregations!!.aggregations() as Aggregations
+        val b = a.asMap().get("tags") as ParsedStringTerms
+        return b.buckets.map {it.key as String}
     }
 }
