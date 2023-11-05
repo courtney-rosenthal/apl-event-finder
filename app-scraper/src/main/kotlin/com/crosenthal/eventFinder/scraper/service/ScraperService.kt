@@ -1,10 +1,12 @@
 package com.crosenthal.eventFinder.scraper.service
 
+import com.crosenthal.eventFinder.elasticsearch.domain.ScrapeIssues
 import com.crosenthal.eventFinder.elasticsearch.service.CalendarEventService
 import com.crosenthal.eventFinder.elasticsearch.service.ScrapeIssuesService
 import com.crosenthal.eventFinder.scraper.ScraperApplication
 import com.crosenthal.eventFinder.scraper.config.ApplicationProperties
 import org.fissore.slf4j.FluentLoggerFactory
+import org.jsoup.HttpStatusException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import java.net.URL
@@ -23,11 +25,22 @@ class ScraperService(
     }
 
     fun scrapeAndSaveOneLink(url: String) {
-        val doc = eventScraper.loadDocumentFromUrl(url)
+        val doc = try {
+             eventScraper.loadDocumentFromUrl(url)
+        } catch (ex: HttpStatusException) {
+            val mssg = "Exception while retrieving document: " + ex.message
+            LOG.warn().log(mssg)
+            val issues = ScrapeIssues(url, "")
+            issues.add(mssg, "skipped")
+            scrapeIssuesService.repository.save(issues)
+            return
+        }
+
         val (event, issues) = eventScraper.scrapeToEvent(doc, url)
         if (event != null) {
             calendarEventService.repository.save(event)
         }
+
         if (issues.hasIssues) {
             scrapeIssuesService.repository.save(issues)
         } else {
