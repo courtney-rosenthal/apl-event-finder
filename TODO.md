@@ -1,7 +1,9 @@
 # To Do
 
 ## Current Tasks
-* implement search by tags
+* build container for UI
+* publish containers to registry
+* setup demo site
 * app-scraper - cleanup EventScraper
 * implement missing tests
 * figure out why logging (e.g. Elasticsearch loggers) isn't working
