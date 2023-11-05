@@ -48,7 +48,7 @@ function formatTime(time) {
     </template>
     <template #content>
       <p>{{ item.summary }}</p>
-      <p>{{ item.location }}</p>
+      <p>{{ item.location.detail }}</p>
       <p>{{ formatTime(item.time) }}</p>
     </template>
   </Card>

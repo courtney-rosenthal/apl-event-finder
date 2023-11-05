@@ -5,7 +5,7 @@ package com.crosenthal.eventFinder.elasticsearch.misc
 data class CalendarEventSearchCriteria(
     val days: Set<Day>? = null,
     val times: Set<Time>? = null,
-    val branches: Set<Branch>? = null,
+    val locations: Set<String>? = null,
     val age: AttendeeAge? = null,
     val tags: Set<String>? = null,
     val searchText: String? = null
@@ -55,7 +55,7 @@ data class CalendarEventSearchCriteria(
         }
     }
 
-    enum class Branch(override val description: String): IsDescribed {
+    enum class Location(override val description: String): IsDescribed {
         ACB("Carver"),
         ACE("Central"),
         ACP("Cepeda"),

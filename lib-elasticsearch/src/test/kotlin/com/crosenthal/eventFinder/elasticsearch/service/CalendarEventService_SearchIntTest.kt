@@ -3,6 +3,7 @@ package com.crosenthal.eventFinder.elasticsearch.service
 import com.crosenthal.eventFinder.elasticsearch.TestUtil
 import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
 import com.crosenthal.eventFinder.elasticsearch.domain.EventDateTime
+import com.crosenthal.eventFinder.elasticsearch.domain.EventLocation
 import com.crosenthal.eventFinder.elasticsearch.domain.RecommendedAge
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.AttendeeAge
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Day
@@ -10,7 +11,6 @@ import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria
 import com.crosenthal.eventFinder.elasticsearch.repository.CalendarEventRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -41,6 +41,7 @@ internal class CalendarEventService_SearchIntTest {
         content: String =  UUID.randomUUID().toString(),
         time: EventDateTime? = null,
         recommendedAge: RecommendedAge? = null,
+        location: EventLocation? = null,
         tags: Set<String> = emptySet(),
     ): CalendarEvent {
         val event = TestUtil.makeEvent(
@@ -48,6 +49,7 @@ internal class CalendarEventService_SearchIntTest {
             content = content,
             time = time,
             recommendedAge = recommendedAge,
+            location = location,
             tags = tags
         )
         return repository.save(event)
@@ -95,9 +97,18 @@ internal class CalendarEventService_SearchIntTest {
     }
 
     @Test
-    @Disabled
-    fun `search by branches`() {
-        TODO()
+    fun `search by locations`() {
+        val a1 = makeEvent(url = "a1", location = EventLocation(key = "AAA", detail = "Location AAA"))
+        val a2 = makeEvent(url = "a2", location = EventLocation(key = "AAA", detail = "Location AAA"))
+        val b1 = makeEvent(url = "b1", location = EventLocation(key = "BBB", detail = "Location BBB"))
+        val b2 = makeEvent(url = "b2", location = EventLocation(key = "BBB", detail = "Location BBB"))
+        val c1 = makeEvent(url = "c1", location = EventLocation(key = "CCC", detail = "Location CCC"))
+        val x1 = makeEvent(url = "x1", location = EventLocation(key = null, detail = "Location XXX"))
+
+        assertThat(service.search(locations = setOf("AAA"))).containsExactlyInAnyOrder(a1, a2)
+        assertThat(service.search(locations = setOf("AAA", "BBB"))).containsExactlyInAnyOrder(a1, a2, b1, b2)
+        assertThat(service.search(locations = setOf("AAA", "ZZZ"))).containsExactlyInAnyOrder(a1, a2)
+        assertThat(service.search(locations = setOf("ZZZ"))).isEmpty()
     }
 
     @Test

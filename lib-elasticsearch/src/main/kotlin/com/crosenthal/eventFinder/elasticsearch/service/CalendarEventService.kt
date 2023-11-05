@@ -3,7 +3,6 @@ package com.crosenthal.eventFinder.elasticsearch.service
 import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.AttendeeAge
-import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Branch
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Day
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Time
 import com.crosenthal.eventFinder.elasticsearch.repository.CalendarEventRepository
@@ -25,7 +24,7 @@ class CalendarEventService(
     fun search(
         days: Set<Day>? = null,
         times: Set<Time>? = null,
-        branches: Set<Branch>? = null,
+        locations: Set<String>? = null,
         age: AttendeeAge? = null,
         tags: Set<String>? = null,
         searchText: String? = null
@@ -33,7 +32,7 @@ class CalendarEventService(
         return search(CalendarEventSearchCriteria(
             days = days,
             times = times,
-            branches = branches,
+            locations = locations,
             age = age,
             tags = tags,
             searchText = searchText
@@ -58,8 +57,8 @@ class CalendarEventService(
             query = query.must(QueryBuilders.termsQuery("time.localHourOfDay", a))
         }
 
-        if (! criteria.branches.isNullOrEmpty()) {
-            query = query.must(QueryBuilders.termsQuery("location.branch", criteria.branches.map(Branch::storedValue)))
+        if (! criteria.locations.isNullOrEmpty()) {
+            query = query.must(QueryBuilders.termsQuery("location.key", criteria.locations))
         }
 
         if (criteria.age != null) {

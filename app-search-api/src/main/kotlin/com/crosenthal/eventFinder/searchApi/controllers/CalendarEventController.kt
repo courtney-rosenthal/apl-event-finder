@@ -3,7 +3,6 @@ package com.crosenthal.eventFinder.searchApi.controllers
 import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.AttendeeAge
-import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Branch
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Day
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Time
 import com.crosenthal.eventFinder.elasticsearch.service.CalendarEventService
@@ -33,7 +32,7 @@ class CalendarEventController(
     fun search(
         @RequestParam days: Set<Day>?,
         @RequestParam times: Set<Time>?,
-        @RequestParam branches: Set<Branch>?,
+        @RequestParam locations: Set<String>?,
         @RequestParam age: AttendeeAge?,
         @RequestParam tags: Set<String>?,
         @RequestParam searchText: String?
@@ -41,7 +40,7 @@ class CalendarEventController(
         return service.search(
             days = days,
             times = times,
-            branches = branches,
+            locations = locations,
             age = age,
             tags = tags ?: emptySet(),
             searchText = searchText ?: ""

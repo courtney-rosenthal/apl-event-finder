@@ -1,6 +1,6 @@
 package com.crosenthal.eventFinder.elasticsearch.misc
 
-import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Branch
+import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Location
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Day
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Time
 import org.assertj.core.api.Assertions.assertThat
@@ -28,8 +28,8 @@ internal class CalendarEventSearchCriteriaTest {
     }
 
     @Test
-    fun `Branch storedValue`() {
-        assertThat(Branch.ANV.storedValue()).isEqualTo("ANV")
+    fun `Location storedValue`() {
+        assertThat(Location.ANV.storedValue()).isEqualTo("ANV")
     }
 
 }
