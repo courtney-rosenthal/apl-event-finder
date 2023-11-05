@@ -1,12 +1,19 @@
 <script setup>
-import { ref } from 'vue';
-import Panel from 'primevue/panel';
-import Fieldset from 'primevue/fieldset';
-import Checkbox from 'primevue/checkbox';
-import InputText from 'primevue/inputtext';
+import {ref} from 'vue';
+
 import Button from 'primevue/button';
+import Checkbox from 'primevue/checkbox';
+import Fieldset from 'primevue/fieldset';
+import InputText from 'primevue/inputtext';
+import Listbox from 'primevue/listbox';
+import Panel from 'primevue/panel';
 import SelectButton from 'primevue/selectbutton';
+
 import EventCard from './EventCard.vue';
+
+
+// TODO: externalize BASE_URL to config
+const BASE_URL = "http://localhost:8080/api"
 
 // The search criteria that will be submitted to the API.
 const searchCriteria = ref({
@@ -108,8 +115,7 @@ function submit() {
     }
   };
 
-  // TODO: externalize base URL to config
-  fetch("http://localhost:8080/api/calendarEvent/search", request)
+  fetch(BASE_URL + "/calendarEvent/search", request)
     .then((response) => {
       if (!response.ok) {
         const error = new Error(response.statusText);
@@ -120,10 +126,26 @@ function submit() {
     }).then((content) => {
       searchResults.value = content;
     }).catch((ex) => {
-      // TODO: do something better with the error
       alert(ex)
     })
 }
+
+
+const allTags = ref([])
+fetch(BASE_URL + "/calendarEvent/tags", {method:"GET"})
+.then((response) => {
+    if (!response.ok) {
+      const error = new Error(response.statusText);
+      error.json = response.json();
+      throw error;
+    }
+    return response.json()
+  }).then((content) => {
+    allTags.value = content;
+  }).catch((ex) => {
+    alert(ex)
+  });
+
 
 </script>
 
@@ -160,8 +182,9 @@ function submit() {
     </Fieldset>
 
     <Fieldset legend="Tags">
-      <!-- criteria.tags-->
-      Picker widget for tags goes here.
+      <Listbox name="criterial.tags" v-model="searchCriteria.tags" :options="allTags" multiple
+               :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:250px" />
+      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('tags')" />
     </Fieldset>
 
     <Fieldset legend="Words or phrases to find">
