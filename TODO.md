@@ -3,6 +3,7 @@
 ## Current Tasks
 * implement search by tags
 * app-scraper - cleanup EventScraper
+* implement missing tests
 * figure out why logging (e.g. Elasticsearch loggers) isn't working
 
 ## Backlog Tasks
