@@ -177,6 +177,7 @@ fetch(BASE_URL + "/calendarEvent/tags", {method:"GET"})
     </Fieldset>
 
     <Fieldset legend="Age">
+      <i class="pi pi-exclamation-triangle" style="color: black; background: yellow; padding: 3px" title='Warning! The "age" criteria is not fully working.'></i>
       <SelectButton v-model="searchCriteria.age" :options="ages" optionLabel="label" optionValue="key" aria-labelledby="basic" />
 <!--      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('age')" />-->
     </Fieldset>
