@@ -42,3 +42,8 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+// do not build plain jar, just bootJar
+tasks.getByName<Jar>("jar") {
+    enabled = false
+}
