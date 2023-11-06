@@ -32,7 +32,7 @@ jobs:
         cache: 'gradle'
 
     - name: Build
-      run: ./gradlew build -x check --no-daemon
+      run: ./gradlew build -x check
 
     - name: Bring up test resources via docker-compose
       uses: isbang/compose-action@v1.5.1
@@ -40,7 +40,7 @@ jobs:
         compose-file: "./.github/docker-compose.yml"
 
     - name: Test
-      run: ./gradlew check --no-daemon
+      run: ./gradlew check
 
     - name: Save test results
       if: success() || failure()
@@ -57,6 +57,7 @@ jobs:
         name: Build Artifacts
         path: |
           */build/libs
+          */build/dist
 
     - name: Build docker images
-      run: ./gradlew dockerBuild --no-daemon
+      run: ./gradlew dockerBuild

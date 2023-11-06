@@ -12,7 +12,7 @@ tasks.register<Copy>("dockerSetup") {
 }
 
 tasks.register<DockerBuildImage>("dockerBuild") {
-    dependsOn("dockerSetupBuild")
+    dependsOn("dockerSetup")
     setProperty("inputDir", layout.buildDirectory.dir("docker"))
     setProperty("images", setOf("${project.name}:latest"))
 }
