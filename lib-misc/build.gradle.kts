@@ -1,5 +1,5 @@
 plugins {
-	id("project-build.common")
+	id("project-build.spring-boot-lib")
 }
 
 dependencies {

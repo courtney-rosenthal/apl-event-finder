@@ -1,6 +1,5 @@
 plugins {
-	id("project-build.common")
-	id("project-build.docker")
+	id("project-build.spring-boot-app")
 }
 
 dependencies {
