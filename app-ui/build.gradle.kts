@@ -9,10 +9,6 @@ node {
     version.set("20.5.0")
 }
 
-tasks.register<NpmTask>("npmInstall") {
-    setProperty("args", listOf("install"))
-}
-
 tasks.register<NpmTask>("build") {
     dependsOn("npmInstall")
     setProperty("args", listOf("run", "build"))
