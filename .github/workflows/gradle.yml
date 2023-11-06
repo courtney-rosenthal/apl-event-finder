@@ -13,8 +13,12 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  REGISTRY: ghcr.io
+
 permissions:
   contents: read
+  packages: write
 
 jobs:
   build:
@@ -59,5 +63,26 @@ jobs:
           */build/libs
           */build/dist
 
-    - name: Build docker images
-      run: ./gradlew dockerBuild
+    - name: Stage Docker build context
+      run: ./gradlew dockerStage
+
+    - name: Log in to the container registry
+      uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata (tags, labels) for app-search-api Docker image
+      id: meta-app-search-api
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      with:
+        images: ${{ env.REGISTRY }}/app-search-api
+
+    - name: Build and push app-search-api Docker image
+      uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      with:
+        context: app-search-api/build/docker
+        push: true
+        tags: ${{ steps.meta-app-search-api.outputs.tags }}
+        labels: ${{ steps.meta-app-search-api.outputs.labels }}
