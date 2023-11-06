@@ -4,7 +4,7 @@ plugins {
     id("com.bmuschko.docker-remote-api")
 }
 
-tasks.register<Copy>("dockerSetup") {
+tasks.register<Copy>("dockerStage") {
     dependsOn("bootJar")
     from(tasks.getByName("bootJar").outputs)
     from("src/main/docker")
@@ -12,7 +12,7 @@ tasks.register<Copy>("dockerSetup") {
 }
 
 tasks.register<DockerBuildImage>("dockerBuild") {
-    dependsOn("dockerSetup")
+    dependsOn("dockerStage")
     setProperty("inputDir", layout.buildDirectory.dir("docker"))
-    setProperty("images", setOf("${project.name}:latest"))
+    setProperty("images", setOf(project.name))
 }

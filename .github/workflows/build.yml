@@ -1,0 +1,101 @@
+name: Build apl-event-finder project
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  REGISTRY: ghcr.io
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
+
+    - name: Build
+      run: ./gradlew build -x check
+
+    - name: Bring up test resources via docker-compose
+      uses: isbang/compose-action@v1.5.1
+      with:
+        compose-file: "./.github/docker-compose.yml"
+
+    - name: Test
+      run: ./gradlew check
+
+    - name: Save test results
+      if: success() || failure()
+      uses: actions/upload-artifact@v3.1.3
+      with:
+        name: Test Results
+        path: |
+         */build/reports
+         */build/test-results
+        
+    - name: Save build artifacts
+      uses: actions/upload-artifact@v3.1.3
+      with:
+        name: Build Artifacts
+        path: |
+          */build/libs
+          */build/dist
+
+    - name: Stage Docker build context
+      if: github.ref == 'refs/heads/main'
+      run: ./gradlew dockerStage
+
+    - name: Log in to the container registry
+      if: github.ref == 'refs/heads/main'
+      uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata (tags, labels) for app-search-api Docker image
+      if: github.ref == 'refs/heads/main'
+      id: meta-app-search-api
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      with:
+        images: ${{ env.REGISTRY }}/${{ github.actor }}/app-search-api
+
+    - name: Build and push app-search-api Docker image
+      if: github.ref == 'refs/heads/main'
+      uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      with:
+        context: app-search-api/build/docker
+        push: true
+        tags: ${{ steps.meta-app-search-api.outputs.tags }}
+        labels: ${{ steps.meta-app-search-api.outputs.labels }}
+
+    - name: Extract metadata (tags, labels) for app-scraper Docker image
+      if: github.ref == 'refs/heads/main'
+      id: meta-app-scraper
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+      with:
+        images: ${{ env.REGISTRY }}/${{ github.actor }}/app-scraper
+
+    - name: Build and push app-scraper Docker image
+      if: github.ref == 'refs/heads/main'
+      uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      with:
+        context: app-scraper/build/docker
+        push: true
+        tags: ${{ steps.meta-app-scraper.outputs.tags }}
+        labels: ${{ steps.meta-app-scraper.outputs.labels }}
