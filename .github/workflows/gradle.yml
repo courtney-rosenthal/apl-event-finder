@@ -31,12 +31,16 @@ jobs:
         distribution: 'temurin'
         cache: 'gradle'
 
+    - name: Build
+      run: ./gradlew build -x check
+
     - name: Bring up test resources via docker-compose
       uses: isbang/compose-action@v1.5.1
       with:
         compose-file: "./.github/docker-compose.yml"
 
-    - run: ./gradlew build --no-daemon
+    - name: Test
+      run: ./gradlew check
 
     - name: Save test results
       if: success() || failure()
@@ -53,3 +57,7 @@ jobs:
         name: Build Artifacts
         path: |
           */build/libs
+          */build/dist
+
+    - name: Build docker images
+      run: ./gradlew dockerBuild

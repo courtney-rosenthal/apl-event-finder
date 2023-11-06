@@ -1,7 +1,6 @@
 # To Do
 
 ## Current Tasks
-* build container for UI
 * publish containers to registry
 * setup demo site
 * app-scraper - cleanup EventScraper
