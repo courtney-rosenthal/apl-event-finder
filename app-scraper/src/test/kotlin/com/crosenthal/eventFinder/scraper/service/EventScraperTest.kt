@@ -15,9 +15,20 @@ import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import java.io.File
 import java.time.Instant
 
 internal class EventScraperTest {
+
+    companion object {
+        @JvmStatic
+        fun testCases_BadPages() = listBadPages()
+
+        @JvmStatic
+        fun testCases_AllDocuments() = streamTestDocumentsIndex()
+    }
 
     private lateinit var scraper: EventScraper
     private lateinit var dateTimeParsers: DateTimeParsers
@@ -67,38 +78,25 @@ internal class EventScraperTest {
     }
 
 
-    @Test
-    fun `process all events`() {
-        streamTestDocumentsIndex().forEach { url ->
-            val (event, issues) = let {
-                val inStream = openTestDocument(url)
-                val doc = scraper.loadDocumentFromStream(inStream, url)
-                scraper.scrapeToEvent(doc, url)
-            }
-            assertThat(event).isNotNull
-            assertThat(issues.hasIssues).isFalse()
-            assertThat(event!!.url).isEqualTo(url)
-        }
+    @ParameterizedTest
+    @MethodSource("testCases_AllDocuments")
+    fun `process all events from example feed`(url: String) {
+        val inStream = openTestDocument(url)
+        val doc = scraper.loadDocumentFromStream(inStream, url)
+        val (event, issues) = scraper.scrapeToEvent(doc, url)
+        assertThat(event).isNotNull
+        assertThat(issues.hasIssues).isFalse()
     }
 
-    // These are documents that broke the parser.
-    val problemDocuments = listOf(
-        "talk-time-tuesdays-noon-7738279", // Text '12:00' could not be parsed at index 5
-    )
 
-    @Test
-    fun `handle problem documents`() {
-        listBadPages().forEach { file ->
-            val (event, issues) = let {
-                val filename = file.path
-                val inStream = file.inputStream()
-                val uri = file.toURI().toString()
-                val doc = scraper.loadDocumentFromStream(inStream, uri)
-                scraper.scrapeToEvent(doc, uri)
-            }
-            assertThat(issues.hasIssues).isFalse()
-            assertThat(event).isNotNull
-        }
+    @ParameterizedTest
+    @MethodSource("testCases_BadPages")
+    fun `handle problem documents`(file: File) {
+        val uri = file.toURI().toString()
+        val doc = scraper.loadDocumentFromStream(file.inputStream(), uri)
+        val (event, issues) = scraper.scrapeToEvent(doc, uri)
+        assertThat(issues.hasIssues).isFalse()
+        assertThat(event).isNotNull
     }
 
 

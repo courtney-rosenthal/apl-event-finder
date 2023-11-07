@@ -29,9 +29,9 @@ object testHelpers {
         return ClassLoader.getSystemResourceAsStream(TEST_PAGES_INDEX).bufferedReader().lines()
     }
 
-    fun listBadPages(): List<File> {
+    fun listBadPages(): Stream<File> {
         val badPages = Thread.currentThread().getContextClassLoader().getResource("exampleContent/badPages/")!!
-        return File(badPages.path).listFiles().filter { ! it.name.startsWith("README") }
+        return File(badPages.path).listFiles().filter { ! it.name.startsWith("README") }.stream()
     }
 
 }
