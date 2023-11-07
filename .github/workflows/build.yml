@@ -101,6 +101,7 @@ jobs:
         labels: ${{ steps.meta-app-scraper.outputs.labels }}
 
     - name: Deploy UI to GitHub Pages
+      if: github.ref == 'refs/heads/main'
       uses: crazy-max/ghaction-github-pages@v4
       with:
         target_branch: gh-pages
