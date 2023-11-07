@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api")
-class HelloController {
+@RequestMapping("/api/ping")
+class PingController {
     @GetMapping
-    fun greeting(@RequestParam(defaultValue = "world") target: String): String {
-        return "hello $target\n"
+    fun ping(@RequestParam(defaultValue = "ping") response: String): String {
+        return response + "\n"
     }
 }
