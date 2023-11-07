@@ -100,7 +100,7 @@ jobs:
         tags: ${{ steps.meta-app-scraper.outputs.tags }}
         labels: ${{ steps.meta-app-scraper.outputs.labels }}
 
-    - name: Deploy to GitHub Pages
+    - name: Deploy UI to GitHub Pages
       uses: crazy-max/ghaction-github-pages@v4
       with:
         target_branch: gh-pages
