@@ -11,9 +11,7 @@ import SelectButton from 'primevue/selectbutton';
 
 import EventCard from './EventCard.vue';
 
-
-// TODO: externalize BASE_URL to config
-const BASE_URL = "http://localhost:8080/api"
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 // The search criteria that will be submitted to the API.
 const searchCriteria = ref({
@@ -126,7 +124,7 @@ function submit() {
     }).then((content) => {
       searchResults.value = content;
     }).catch((ex) => {
-      alert(ex)
+      alert("Failed to retrieve list of tags from the service.\n\nDetail:\n" + ex);
     })
 }
 
@@ -143,7 +141,7 @@ fetch(BASE_URL + "/calendarEvent/tags", {method:"GET"})
   }).then((content) => {
     allTags.value = content;
   }).catch((ex) => {
-    alert(ex)
+    alert("Failed to retrieve list of tags from the service.\n\nDetail:\n" + ex);
   });
 
 

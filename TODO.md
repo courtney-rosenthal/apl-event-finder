@@ -1,11 +1,10 @@
 # To Do
 
 ## Current Tasks
-* publish containers to registry
 * setup demo site
 * app-scraper - cleanup EventScraper
 * implement missing tests
-* figure out why logging (e.g. Elasticsearch loggers) isn't working
+* figure out why Elasticsearch loggers aren't working
 
 ## Backlog Tasks
 * lib-elasticsearch - filter out past events and deleted events
@@ -15,7 +14,6 @@
 * app-ui - add pagination (frontend)
 
 ## Tech Debt
-* app-ui - move API base URL to config
 * app-scraper - move localZoneId to config
 
 ## Future Tasks
