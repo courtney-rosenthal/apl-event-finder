@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/ping")
 class PingController {
     @GetMapping
-    fun ping(@RequestParam response: String? = "pong"): String {
-        return response + "\n"
+    fun ping(@RequestParam response: String?): String {
+        return (response ?: "pong") + "\n"
     }
 }
