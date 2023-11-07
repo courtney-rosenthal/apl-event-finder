@@ -1,7 +1,6 @@
 # To Do
 
 ## Current Tasks
-* setup demo site
 * app-scraper - cleanup EventScraper
 * implement missing tests
 * figure out why Elasticsearch loggers aren't working
