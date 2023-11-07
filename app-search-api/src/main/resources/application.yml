@@ -1,4 +1,15 @@
 logging:
   level:
-    com.crosenthal.eventFinder: debug
-    org.springframework.data.elasticsearch: debug
+#    com.crosenthal.eventFinder: debug
+#    org.springframework.data.elasticsearch: debug
+
+management:
+  endpoints:
+      web:
+        exposure:
+          include: "configprops,env,health,info,logfile,loggers,metrics"
+  endpoint:
+    health:
+      show-details: always
+
+
