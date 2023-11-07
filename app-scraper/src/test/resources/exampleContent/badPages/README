@@ -1,0 +1,3 @@
+These files, at one time, caused the parser to fail.
+
+talk-time-tuesdays-noon-7738279         Text '12:00' could not be parsed at index 5
