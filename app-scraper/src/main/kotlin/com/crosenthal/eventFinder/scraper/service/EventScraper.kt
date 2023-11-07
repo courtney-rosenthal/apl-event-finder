@@ -13,6 +13,7 @@ import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import org.springframework.stereotype.Service
 import java.io.InputStream
+import java.time.format.DateTimeParseException
 
 /**
  * Scrape a web page that contains a single event.
@@ -190,6 +191,8 @@ class EventScraper(
                 try {
                     event.time = dateTimeParsers.parseEventDateTime(txt)
                 } catch (ex: IllegalArgumentException) {
+                    issues.add(ex.getRootMessage(), "dropped", element)
+                } catch (ex: DateTimeParseException) {
                     issues.add(ex.getRootMessage(), "dropped", element)
                 }
             }

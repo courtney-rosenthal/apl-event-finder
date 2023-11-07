@@ -8,6 +8,7 @@ import com.crosenthal.eventFinder.locations.LocationService
 import com.crosenthal.eventFinder.scraper.service.DateTimeParsers
 import com.crosenthal.eventFinder.scraper.service.EventScraper
 import crosenthal.com.eventFinder.scraper.testHelpers.TEST_URL
+import crosenthal.com.eventFinder.scraper.testHelpers.listBadPages
 import crosenthal.com.eventFinder.scraper.testHelpers.openTestDocument
 import crosenthal.com.eventFinder.scraper.testHelpers.streamTestDocumentsIndex
 import io.mockk.mockk
@@ -77,6 +78,26 @@ internal class EventScraperTest {
             assertThat(event).isNotNull
             assertThat(issues.hasIssues).isFalse()
             assertThat(event!!.url).isEqualTo(url)
+        }
+    }
+
+    // These are documents that broke the parser.
+    val problemDocuments = listOf(
+        "talk-time-tuesdays-noon-7738279", // Text '12:00' could not be parsed at index 5
+    )
+
+    @Test
+    fun `handle problem documents`() {
+        listBadPages().forEach { file ->
+            val (event, issues) = let {
+                val filename = file.path
+                val inStream = file.inputStream()
+                val uri = file.toURI().toString()
+                val doc = scraper.loadDocumentFromStream(inStream, uri)
+                scraper.scrapeToEvent(doc, uri)
+            }
+            assertThat(issues.hasIssues).isFalse()
+            assertThat(event).isNotNull
         }
     }
 

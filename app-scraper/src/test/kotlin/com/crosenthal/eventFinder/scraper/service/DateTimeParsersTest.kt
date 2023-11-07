@@ -35,6 +35,7 @@ internal class DateTimeParsersTest {
     @Test
     fun parseLocalTime() {
         assertThat(parsers.parseLocalTime("7:00 PM")).isEqualTo(LocalTime.of(19, 0, 0))
+        assertThat(parsers.parseLocalTime("13:00")).isEqualTo(LocalTime.of(13, 0, 0))
     }
 
     @Test

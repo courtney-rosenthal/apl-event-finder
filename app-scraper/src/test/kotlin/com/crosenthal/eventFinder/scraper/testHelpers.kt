@@ -1,5 +1,6 @@
 package crosenthal.com.eventFinder.scraper
 
+import java.io.File
 import java.io.InputStream
 import java.util.stream.Stream
 
@@ -24,14 +25,13 @@ object testHelpers {
         return inStream
     }
 
-//    fun scrapeFromInputStream(scraper: EventScraper, inStream: InputStream, url: String) : Pair<CalendarEvent, ScrapeIssues> {
-//        val doc = scraper.loadDocumentFromStream(inStream, url)
-//        val result = scraper.scrapeToEvent(doc, url)
-//        return result
-//    }
-
     fun streamTestDocumentsIndex() : Stream<String> {
         return ClassLoader.getSystemResourceAsStream(TEST_PAGES_INDEX).bufferedReader().lines()
+    }
+
+    fun listBadPages(): List<File> {
+        val badPages = Thread.currentThread().getContextClassLoader().getResource("exampleContent/badPages/")!!
+        return File(badPages.path).listFiles().filter { ! it.name.startsWith("README") }
     }
 
 }

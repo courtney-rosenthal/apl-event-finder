@@ -4,6 +4,7 @@ import com.crosenthal.eventFinder.elasticsearch.domain.EventDateTime
 import com.crosenthal.eventFinder.elasticsearch.domain.RecommendedAge
 import com.crosenthal.eventFinder.scraper.util.cleanupWhiteSpace
 import org.springframework.stereotype.Service
+import java.time.DateTimeException
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -49,11 +50,21 @@ class DateTimeParsers {
 
     // ======================================================================
 
-    // "7:00 PM"
-    internal val timeFormatter = DateTimeFormatter.ofPattern("h:m a")
+    // "7:00 PM" or "12:00"
+    internal val timeFormatters = listOf(
+        DateTimeFormatter.ofPattern("h:m a"), // 12-hour with AM/PM
+        DateTimeFormatter.ofPattern("k:m"),   // 24-hour
+    )
 
     fun parseLocalTime(timeStr: String) : LocalTime {
-        return LocalTime.parse(timeStr, timeFormatter)
+        timeFormatters.forEach {
+            try {
+                return LocalTime.parse(timeStr, it)
+            } catch (ex: DateTimeParseException) {
+                // ignore
+            }
+        }
+        throw DateTimeException("cannot parse time from: " + timeStr)
     }
 
 
