@@ -1,5 +1,5 @@
-logging:
-  level:
+#logging:
+#  level:
 #    com.crosenthal.eventFinder: debug
 #    org.springframework.data.elasticsearch: debug
 
