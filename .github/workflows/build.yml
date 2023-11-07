@@ -10,7 +10,7 @@ env:
   REGISTRY: ghcr.io
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 jobs:
@@ -99,3 +99,12 @@ jobs:
         push: true
         tags: ${{ steps.meta-app-scraper.outputs.tags }}
         labels: ${{ steps.meta-app-scraper.outputs.labels }}
+
+    - name: Deploy UI to GitHub Pages
+      if: github.ref == 'refs/heads/main'
+      uses: crazy-max/ghaction-github-pages@v4
+      with:
+        target_branch: gh-pages
+        build_dir: app-ui/build/dist/
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
