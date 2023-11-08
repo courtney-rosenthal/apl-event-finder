@@ -8,7 +8,7 @@ services:
       - network.host=0.0.0.0
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ulimits:
       nofile:
         soft: 65536
@@ -19,6 +19,8 @@ services:
       - elasticsearch_data:/usr/share/elasticsearch/data/
 
   kibana:
+    profiles:
+      - kibana
     image: docker.elastic.co/kibana/kibana:7.17.10
     ports:
       - 5601:5601
