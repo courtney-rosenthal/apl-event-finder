@@ -8,6 +8,7 @@ import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria
 import com.crosenthal.eventFinder.elasticsearch.service.CalendarEventService
 import com.crosenthal.eventFinder.searchApi.exceptions.EntityNotFound
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -28,7 +29,7 @@ class CalendarEventController(
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Search for events")
+    @Operation(summary = "Retrieve events based on search criteria, sorted in chronological ascending order")
     fun search(
         @RequestParam days: Set<Day>?,
         @RequestParam times: Set<Time>?,
@@ -48,14 +49,14 @@ class CalendarEventController(
     }
 
     @PostMapping("/search")
-    @Operation(summary = "Search for events")
+    @Operation(summary = "Retrieve events based on search criteria, sorted in chronological ascending order")
     fun search(@RequestBody criteria: CalendarEventSearchCriteria) : List<CalendarEvent> {
         return service.search(criteria)
     }
 
 
     @GetMapping("/tags")
-    @Operation(summary = "Return list of known tags")
+    @Operation(summary = "Retrieve all tags used in current events, sorted in alpha ascending order")
     fun tags() : List<String> {
         return service.listTags()
     }

@@ -6,20 +6,23 @@ import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Day
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Time
 import com.crosenthal.eventFinder.elasticsearch.repository.CalendarEventRepository
+import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
 import org.elasticsearch.search.aggregations.AggregationBuilders
 import org.elasticsearch.search.aggregations.Aggregations
 import org.elasticsearch.search.aggregations.BucketOrder
 import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.domain.Pageable
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.stereotype.Service
+import java.time.Instant
 
 @Service
 class CalendarEventService(
-    repository: CalendarEventRepository
+    @Qualifier("calendarEventRepository") repository: CalendarEventRepository
 ) : BaseService<CalendarEvent, CalendarEventRepository>(repository) {
 
     @Autowired
@@ -43,15 +46,24 @@ class CalendarEventService(
         ))
     }
 
+    // TODO - move this to config
+    val INCLUDE_PAST_EVENTS = true
+
+    internal fun newCalendarEventQueryBuilder(): BoolQueryBuilder {
+        return QueryBuilders.boolQuery()
+            .mustNot(QueryBuilders.termsQuery("isDeleted", true))
+            .let {
+                if (INCLUDE_PAST_EVENTS) {
+                    it
+                } else {
+                    it.must(QueryBuilders.rangeQuery("time.start").gte(Instant.now()))
+                }
+            }
+    }
+
     fun search(criteria: CalendarEventSearchCriteria): List<CalendarEvent> {
 
-        var query = QueryBuilders.boolQuery()
-
-        // skip events marked deleted
-        query = query.mustNot(QueryBuilders.termsQuery("isDeleted", true))
-
-        // TODO - eventually enable this, once we have the index updating regularly
-        // query = query.must(QueryBuilders.rangeQuery("time.start").gte(Instant.now()))
+        var query = newCalendarEventQueryBuilder()
 
         if (! criteria.days.isNullOrEmpty()) {
             val a = criteria.days.flatMap {it.expand()}.map {it.description }.toSet()
@@ -102,6 +114,7 @@ class CalendarEventService(
 
         var nativeSearchQuery = NativeSearchQueryBuilder()
             .withQuery(query)
+            // TODO: sort chronological
             .withPageable(Pageable.ofSize(20))
             .build()
 
@@ -111,8 +124,9 @@ class CalendarEventService(
     }
 
     fun listTags(): List<String> {
+
         val nativeSearchQuery = NativeSearchQueryBuilder()
-            .withQuery(QueryBuilders.matchAllQuery())
+            .withQuery(newCalendarEventQueryBuilder())
             .withAggregations(AggregationBuilders.terms("tags").field("tags").size(Int.MAX_VALUE).order(BucketOrder.key(true)))
             .build()
 

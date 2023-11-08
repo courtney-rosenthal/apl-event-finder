@@ -1,5 +1,7 @@
 package com.crosenthal.eventFinder.elasticsearch.repository
 
+import com.crosenthal.eventFinder.elasticsearch.ElasticsearchConfig
+import com.crosenthal.eventFinder.elasticsearch.ElasticsearchProperties
 import com.crosenthal.eventFinder.elasticsearch.TestUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -8,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.SpringBootTest
 
-@SpringBootTest(classes = [com.crosenthal.eventFinder.elasticsearch.ElasticsearchProperties::class, com.crosenthal.eventFinder.elasticsearch.ElasticsearchConfig::class])
-@EnableConfigurationProperties(com.crosenthal.eventFinder.elasticsearch.ElasticsearchProperties::class)
-class CalendarEventRespositoryIntTest {
+@SpringBootTest(classes = [ElasticsearchProperties::class, ElasticsearchConfig::class])
+@EnableConfigurationProperties(ElasticsearchProperties::class)
+internal class CalendarEventRespositoryIntTest {
 
     @Autowired
     lateinit var repository: CalendarEventRepository

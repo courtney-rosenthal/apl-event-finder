@@ -1,5 +1,7 @@
 package com.crosenthal.eventFinder.elasticsearch.service
 
+import com.crosenthal.eventFinder.elasticsearch.ElasticsearchConfig
+import com.crosenthal.eventFinder.elasticsearch.ElasticsearchProperties
 import com.crosenthal.eventFinder.elasticsearch.TestUtil
 import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
 import com.crosenthal.eventFinder.elasticsearch.domain.EventDateTime
@@ -21,10 +23,10 @@ import java.time.LocalTime
 import java.util.UUID
 
 
-@SpringBootTest(classes = [com.crosenthal.eventFinder.elasticsearch.ElasticsearchProperties::class, com.crosenthal.eventFinder.elasticsearch.ElasticsearchConfig::class, CalendarEventService::class])
-@EnableConfigurationProperties(com.crosenthal.eventFinder.elasticsearch.ElasticsearchProperties::class)
+@SpringBootTest(classes = [ElasticsearchProperties::class, ElasticsearchConfig::class, CalendarEventService::class])
+@EnableConfigurationProperties(ElasticsearchProperties::class)
 @Suppress("UNUSED_VARIABLE") // there's a bunch of unused variables, just ignore them
-internal class CalendarEventService_SearchIntTest {
+internal class CalendarEventServiceIntegrationTest {
 
     @Autowired @Qualifier("calendarEventRepository")
     lateinit var repository: CalendarEventRepository

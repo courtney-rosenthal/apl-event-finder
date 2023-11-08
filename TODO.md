@@ -4,9 +4,9 @@
 * implement missing tests
 * cleanup EventScraper class
 * figure out why Elasticsearch loggers aren't working
+* CalendarEventService.search() should return events in chronological order
 
 ## New Capabilities
-* Add endpoint to retrieve scrape issues
 * Put deployment docker-compose into dist subdir
 * Add traefik to docker-compose and implement SSL
 * Implement paging of results

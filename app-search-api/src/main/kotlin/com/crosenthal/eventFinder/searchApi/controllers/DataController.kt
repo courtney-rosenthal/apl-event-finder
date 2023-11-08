@@ -12,7 +12,8 @@ class DataController(
     val locationService: LocationService
 ) {
 
-    @GetMapping("/locations")
+    // TODO - this isn't ready for use
+    //@GetMapping("/locations")
     @Operation(summary = "List known locations")
     fun locations() : Map<String, String> {
         return locationService.getAllLocations()
