@@ -6,7 +6,7 @@
 * figure out why Elasticsearch loggers aren't working
 
 ## Backlog Tasks
-* lib-elasticsearch - filter out past events and deleted events
+* lib-elasticsearch - filter out past events
 * app-scraper - rework how ScrapeIssues are recorded and reported
 * app-scraper - add config to force https
 * app-search-api - add pagination (backend)
