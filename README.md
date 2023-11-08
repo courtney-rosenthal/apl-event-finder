@@ -20,48 +20,100 @@ There are four microservices in this project:
 STATUS: The three listed services currently have MVP implementations.
 See the TODO.md document for short-term development plans.
 
-## Development Setup
+## Demo Instance
 
-The microservices are coded in Kotlin using Spring Boot. The Gradle build 
-system is used.
+There is a demo instance running at:
+https://courtney-rosenthal.github.io/apl-event-finder/
 
-At this time the only additional service required is Elasticserach. A 
-_dev/docker-compose.yml_ file starts the services needed for development and 
-test.
+The demo instance has a Swagger UI for its API here:
+http://apl-event-svc.crosenthal.com:8080/swagger-ui/index.html
 
-Here is the bring-up procedure on a new (Linux) host:
+### Insecure Content - IMPORTANT!!!
 
-* Check out this project locally from https://github.com/courtney-rosenthal/apl-event-finder
-* Install _docker.io_ and _docker-compose_
-* Install openjdk-17-jdk (I also installed _doc_ and _source_ packages)
-* Do build (without tests): ./gradlew clean build -x check
-* Start services: docker-compose -f dev/docker-compose.yml up
-* Run tests: ./gradlew check
-* Start API service: java -jar app-search-api/build/libs/app-search-api-*.jar
-  * FIXME: get "no main manifest attribute" when doing this (for now, I'll 
-    use IntelliJ to launch service)
-  * TODO: make this a Gradle _bootRun_ task
-* Install nvm
-  * Directions here: https://github.com/nvm-sh/nvm
-  * Then run: nvm install 20.5.0
-* Setup web ui:
-  * cd app-ui
-  * npm install
-  * npm run dev
+The backend service currently does not have _https_ security implemented, so 
+you will need to adjust your browser to allow "Insecure content" for this site.
 
-Command line directions for build and test:
+Without this, requests to the backend service will be blocked by the browser 
+with a pop-up error.
 
-    docker-compose up [--detach]    # bring up services
-    ./gradlew clean build -x check  # perform build (skip tests)
-    ./gradlew check                 # perform tests
+To work around this with a Google Chrome-based browser:
+  * Browse to the demo site (link above)
+  * Click on the lock (or other icon) next to the URL
+  * Select: Site settings
+  * Scroll down to the "Insecure content" setting
+  * Change it to: Allow
+
+## Development
+
+The backend microservices are coded in _Kotlin_ using _Spring Boot_.
+_Elasticsearch_ is used for data storage and searching.
+_Gradle_ is used for builds.
+
+The frontend is implemented with _PrimeVue_,
+which is the _Vue.js_ framework and the _PrimeUI_ widget library.
+It has been built and tested with _Node_ version 20.5.0.
+
+### Full Stack Development
+
+For full stack development, all the services and resources are run locally. 
+To setup your environment, perform the following steps.
+
+To build the entire project, from the project base directory run:
+
+    ./gradlew build -x check
+
+To start Elasticsearch (needed for tests and execution), run:
+
+    docker-compose -f dev/docker-compose.yml up [-d]
+
+The "-d" above is optional. Include it to "detach" and run the services in 
+the background. Omit it to keep the services running in the foreground.
+
+Next, to run the test suite, do:
+
+    ./gradlew check
+
+To perform a trial run of the scraper app (this will go to
+_library.austintexas.gov_ and retrieve 10 upcoming events, do:
+
+    ./gradlew app-scraper:bootRun
+
+To start the API service, run:
+
+    ./gradlew app-search-api:bootRun
+
+You can verify the service is running with:
+
+    $ curl http://localhost:8080/api/ping
+    pong
+
+The Swagger interface to the API will be available here:
+http://localhost:8080/swagger-ui/index.html
+
+The front-end can be launched with:
+
+    cd app-ui
+    npm run dev
+
+The front-end will be available at:
+http://localhost:5173/
+
+
+### Front-End Development
+
+*TO DO*
+
 
 ## Deployment
 
-This package is not ready for deployment.
-
-At this time, execution is being done through the IDE. Standalone execution 
-(initially Gradle _bootrun_ tasks, eventually Docker containers) are TBD.
+*TO DO*
 
 ## Author
 
 Courtney Rosenthal <cr@crosenthal.com>
+
+The source to this project is here:
+https://github.com/courtney-rosenthal/apl-event-finder
+
+The license for use is here:
+https://github.com/courtney-rosenthal/apl-event-finder/blob/main/LICENSE
