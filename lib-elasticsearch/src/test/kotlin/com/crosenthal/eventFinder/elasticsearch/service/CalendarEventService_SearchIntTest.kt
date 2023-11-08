@@ -23,6 +23,7 @@ import java.util.UUID
 
 @SpringBootTest(classes = [com.crosenthal.eventFinder.elasticsearch.ElasticsearchProperties::class, com.crosenthal.eventFinder.elasticsearch.ElasticsearchConfig::class, CalendarEventService::class])
 @EnableConfigurationProperties(com.crosenthal.eventFinder.elasticsearch.ElasticsearchProperties::class)
+@Suppress("UNUSED_VARIABLE") // there's a bunch of unused variables, just ignore them
 internal class CalendarEventService_SearchIntTest {
 
     @Autowired @Qualifier("calendarEventRepository")
