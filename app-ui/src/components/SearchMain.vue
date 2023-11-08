@@ -104,6 +104,10 @@ const ages = [
   {key: null, label: "All ages"}
 ];
 
+const insecureWarning = "\n\nNOTE: At this time the backend runs in 'insecure' mode. " +
+    "You may be able to fix this error by: " +
+    "click the lock in the URL bar -> Site settings -> Insecure content -> Allow.";
+
 function submit() {
   const request = {
     method: "POST",
@@ -124,14 +128,14 @@ function submit() {
     }).then((content) => {
       searchResults.value = content;
     }).catch((ex) => {
-      alert("Failed to retrieve list of tags from the service.\n\nDetail:\n" + ex);
+      alert("Failed to submit search request to the service.\n\nDetail:\n" + ex + insecureWarning);
     })
 }
 
 
 const allTags = ref([])
-fetch(BASE_URL + "/calendarEvent/tags", {method:"GET"})
-.then((response) => {
+fetch(BASE_URL + "/calendarEvent/tags", {method: "GET"})
+  .then((response) => {
     if (!response.ok) {
       const error = new Error(response.statusText);
       error.json = response.json();
@@ -141,7 +145,7 @@ fetch(BASE_URL + "/calendarEvent/tags", {method:"GET"})
   }).then((content) => {
     allTags.value = content;
   }).catch((ex) => {
-    alert("Failed to retrieve list of tags from the service.\n\nDetail:\n" + ex);
+    alert("Failed to retrieve list of tags from the service.\n\nDetail:\n" + ex + insecureWarning);
   });
 
 
