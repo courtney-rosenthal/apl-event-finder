@@ -1,23 +1,24 @@
 # To Do
 
-## Current Tasks
-* app-scraper - cleanup EventScraper
+## Current Tech Debt
 * implement missing tests
+* cleanup EventScraper class
 * figure out why Elasticsearch loggers aren't working
 
-## Backlog Tasks
-* lib-elasticsearch - filter out past events
-* app-scraper - rework how ScrapeIssues are recorded and reported
-* app-scraper - add config to force https
-* app-search-api - add pagination (backend)
-* app-ui - add pagination (frontend)
+## New Capabilities
+* Add endpoint to retrieve scrape issues
+* Put deployment docker-compose into dist subdir
+* Add traefik to docker-compose and implement SSL
+* Implement paging of results
+* Implement periodic update of index
+* Filter out past events
 
-## Tech Debt
-* app-scraper - move localZoneId to config
+## Backlog Tech Debt
+* add config to force https (to avoid all the redirections when pulling events)
+* move localZoneId to config
 * test ssl and auth for ElasticSearch
+* add test coverage report to build
 
 ## Future Tasks
 * move form content out of app-ui into a service
 * app-scraper - add Redis and record scrapes (to track adds/deletes)
-* app-scraper - add mode to just check for adds/deletes
-* app-scraper - add periodic scheduling for scrapes
