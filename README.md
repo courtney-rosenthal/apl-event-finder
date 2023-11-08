@@ -101,12 +101,21 @@ http://localhost:5173/
 
 ### Front-End Development
 
-*TO DO*
+The setup to do front-end development is much simpler than the above.
 
+To run the front-end UI locally, using the backend service running for the 
+demo site, do:
+
+    cd app-ui
+    VITE_API_BASE_URL="http://apl-event-svc.crosenthal.com:8080/api" npm run dev
+
+The front-end will be available at:
+http://localhost:5173/
 
 ## Deployment
 
 *TO DO*
+
 
 ## Author
 
