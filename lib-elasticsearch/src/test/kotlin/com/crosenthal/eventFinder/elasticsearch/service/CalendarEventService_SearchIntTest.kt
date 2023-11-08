@@ -159,4 +159,17 @@ internal class CalendarEventService_SearchIntTest {
         assertThat(service.search(searchText = "cupcakes")).isEmpty()
     }
 
+    @Test
+    fun listTags() {
+        val (TAG1, TAG2, TAG3, TAG4) = arrayOf("tag1", "tag2", "tag3", "tag4")
+        makeEvent("t0", tags = emptySet())
+        assertThat(service.listTags()).isEmpty()
+
+        makeEvent("t1", tags = setOf(TAG1))
+        makeEvent("t2", tags = setOf(TAG2))
+        makeEvent("t12", tags = setOf(TAG1, TAG2))
+        makeEvent("t13", tags = setOf(TAG1, TAG3))
+        assertThat(service.listTags()).containsExactlyInAnyOrder(TAG1, TAG2, TAG3)
+    }
+
 }
