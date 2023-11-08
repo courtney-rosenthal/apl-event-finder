@@ -45,11 +45,13 @@ class CalendarEventService(
 
     fun search(criteria: CalendarEventSearchCriteria): List<CalendarEvent> {
 
-        // TODO: add tags
-        // TODO: skip isDeleted == true
-        // TODO: skip time.start < now
-
         var query = QueryBuilders.boolQuery()
+
+        // skip events marked deleted
+        query = query.mustNot(QueryBuilders.termsQuery("isDeleted", true))
+
+        // TODO - eventually enable this, once we have the index updating regularly
+        // query = query.must(QueryBuilders.rangeQuery("time.start").gte(Instant.now()))
 
         if (! criteria.days.isNullOrEmpty()) {
             val a = criteria.days.flatMap {it.expand()}.map {it.description }.toSet()

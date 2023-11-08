@@ -44,6 +44,7 @@ internal class CalendarEventService_SearchIntTest {
         recommendedAge: RecommendedAge? = null,
         location: EventLocation? = null,
         tags: Set<String> = emptySet(),
+        isDeleted: Boolean = false,
     ): CalendarEvent {
         val event = TestUtil.makeEvent(
             url = url,
@@ -51,7 +52,8 @@ internal class CalendarEventService_SearchIntTest {
             time = time,
             recommendedAge = recommendedAge,
             location = location,
-            tags = tags
+            tags = tags,
+            isDeleted = isDeleted,
         )
         return repository.save(event)
     }
@@ -157,6 +159,13 @@ internal class CalendarEventService_SearchIntTest {
         assertThat(service.search(searchText = "quick")).containsExactlyInAnyOrder(a)
         assertThat(service.search(searchText = "the")).containsExactlyInAnyOrder(a, c)
         assertThat(service.search(searchText = "cupcakes")).isEmpty()
+    }
+
+    @Test
+    fun `search excludes deleted events`() {
+        val a = makeEvent("a", isDeleted = false)
+        val b = makeEvent("b", isDeleted = true)
+        assertThat(service.search()).containsExactlyInAnyOrder(a)
     }
 
     @Test

@@ -29,6 +29,7 @@ object TestUtil {
         // optional fields in the CalendarEvent
         recommendedAge: RecommendedAge? = null,
         tags: Set<String> = emptySet(),
+        isDeleted: Boolean = false,
     ): CalendarEvent {
         return CalendarEvent.Builder(url = url, content = content ).apply {
             this.title = title ?: EVENT_TITLE
@@ -37,6 +38,7 @@ object TestUtil {
             this.location = location ?: EVENT_LOCATION
             this.recommendedAge = recommendedAge
             this.tags = tags
+            this.isDeleted = isDeleted
         }.build(mockk())!!
     }
 
