@@ -20,21 +20,42 @@ internal class CalendarEventRespositoryIntTest {
     @BeforeEach
     fun setup() {
         repository.deleteAll()
+        assertThat(repository.findAll()).isEmpty()
     }
+
 
     @Test
     fun save() {
         val event0 = TestUtil.makeEvent()
-        assertThat(repository.findById(event0.url)).isEmpty
-
-        val event = repository.save(event0)
-        assertThat(event)
+        val event1 = repository.save(event0)
+        assertThat(repository.count()).isEqualTo(1)
+        assertThat(event1)
             .usingRecursiveComparison()
-            .ignoringFields("timestamp")
             .isEqualTo(event0)
+    }
 
-        val result = repository.findById(event.url)
-        assertThat(result.get()).usingRecursiveComparison().isEqualTo(event)
+    @Test
+    fun findbyId() {
+        val event0 = TestUtil.makeEvent()
+        repository.save(event0)
+        assertThat(repository.count()).isEqualTo(1)
+        val event1 = repository.findById(event0.url).orElse(null)
+        assertThat(event1)
+            .usingRecursiveComparison()
+            .isEqualTo(event0)
+    }
+
+    @Test
+    fun update() {
+        val event0 = TestUtil.makeEvent()
+        repository.save(event0)
+        assertThat(repository.count()).isEqualTo(1)
+        val UPDATED = "I am updated content"
+        val event1 = event0.copy(content = UPDATED)
+        repository.save(event1)
+        assertThat(repository.count()).isEqualTo(1)
+        val event2 = repository.findAll().first()
+        assertThat(event2).usingRecursiveComparison().isEqualTo(event1)
     }
 
 }
