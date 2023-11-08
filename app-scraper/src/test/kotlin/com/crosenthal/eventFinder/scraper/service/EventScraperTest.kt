@@ -7,39 +7,34 @@ import com.crosenthal.eventFinder.elasticsearch.domain.RecommendedAge
 import com.crosenthal.eventFinder.locations.LocationService
 import com.crosenthal.eventFinder.scraper.service.DateTimeParsers
 import com.crosenthal.eventFinder.scraper.service.EventScraper
+import crosenthal.com.eventFinder.scraper.testHelpers.BAD_PAGES_DIR
+import crosenthal.com.eventFinder.scraper.testHelpers.EXAMPLE_PAGES_DIR
 import crosenthal.com.eventFinder.scraper.testHelpers.TEST_URL
-import crosenthal.com.eventFinder.scraper.testHelpers.listBadPages
 import crosenthal.com.eventFinder.scraper.testHelpers.openTestDocument
-import crosenthal.com.eventFinder.scraper.testHelpers.streamTestDocumentsIndex
+import crosenthal.com.eventFinder.scraper.testHelpers.streamPagesFrom
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import java.io.File
 import java.time.Instant
 
+@SpringBootTest(classes = [EventScraper::class, DateTimeParsers::class, LocationService::class])
 internal class EventScraperTest {
+
+    @Autowired
+    lateinit var scraper: EventScraper
 
     companion object {
         @JvmStatic
-        fun testCases_BadPages() = listBadPages()
+        fun testCases_AllDocuments() = streamPagesFrom(EXAMPLE_PAGES_DIR)
 
         @JvmStatic
-        fun testCases_AllDocuments() = streamTestDocumentsIndex()
-    }
-
-    private lateinit var scraper: EventScraper
-    private lateinit var dateTimeParsers: DateTimeParsers
-    private lateinit var locationService: LocationService
-
-    @BeforeEach
-    fun setup() {
-        dateTimeParsers = DateTimeParsers()
-        locationService = LocationService()
-        locationService.initialize()
-        scraper = EventScraper(dateTimeParsers, locationService)
+        fun testCases_BadPages() = streamPagesFrom(BAD_PAGES_DIR)
     }
 
     @Test
@@ -77,26 +72,24 @@ internal class EventScraperTest {
         assertThat(event!!.content).startsWith("<div class=\"field-title\">")
     }
 
-
-    @ParameterizedTest
-    @MethodSource("testCases_AllDocuments")
-    fun `process all events from example feed`(url: String) {
-        val inStream = openTestDocument(url)
-        val doc = scraper.loadDocumentFromStream(inStream, url)
-        val (event, issues) = scraper.scrapeToEvent(doc, url)
-        assertThat(event).isNotNull
-        assertThat(issues.hasIssues).isFalse()
-    }
-
-
-    @ParameterizedTest
-    @MethodSource("testCases_BadPages")
-    fun `handle problem documents`(file: File) {
+    internal fun testScrapeOnOneFile(file: File) {
         val uri = file.toURI().toString()
         val doc = scraper.loadDocumentFromStream(file.inputStream(), uri)
         val (event, issues) = scraper.scrapeToEvent(doc, uri)
         assertThat(issues.hasIssues).isFalse()
         assertThat(event).isNotNull
+    }
+
+    @ParameterizedTest
+    @MethodSource("testCases_AllDocuments")
+    fun `process all events from example feed`(file: File) {
+        testScrapeOnOneFile(file)
+    }
+
+    @ParameterizedTest
+    @MethodSource("testCases_BadPages")
+    fun `handle problem documents`(file: File) {
+        testScrapeOnOneFile(file)
     }
 
 
