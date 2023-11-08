@@ -18,10 +18,24 @@ open class ElasticsearchConfig(
     @Bean
     @Suppress("DEPRECATION") // https://github.com/spring-projects/spring-boot/issues/28598
     override fun elasticsearchClient(): org.elasticsearch.client.RestHighLevelClient {
-        val clientConfiguration: ClientConfiguration = ClientConfiguration.builder()
+        val clientconfiguration = ClientConfiguration.builder()
             .connectedTo(props.serverHostAndPort)
-            .build()
-        return RestClients.create(clientConfiguration).rest()
+            .let {
+                if (props.useSSL) {
+                    it.usingSsl()
+                } else {
+                    it
+                }
+            }.let {
+                val u = props.authUsername
+                val p = props.authPassword
+                if (u != null && p != null) {
+                    it.withBasicAuth(u, p)
+                } else {
+                    it
+                }
+            }.build()
+        return RestClients.create(clientconfiguration).rest()
     }
 
 }

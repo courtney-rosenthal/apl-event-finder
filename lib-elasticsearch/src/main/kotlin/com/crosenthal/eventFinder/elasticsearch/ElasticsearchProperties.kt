@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Configuration
 open class ElasticsearchProperties() {
     var indexPrefix: String = ""
     var serverHostAndPort: String = "localhost:9200"
-    // TODO: var useSSL: Boolean = false
-    // TODO: var authUsername: String? = null
-    // TODO: var authPassword: String? = null
+    // ssl and auth have not been tested
+    var useSSL: Boolean = false
+    var authUsername: String? = null
+    var authPassword: String? = null
 }

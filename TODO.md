@@ -14,6 +14,7 @@
 
 ## Tech Debt
 * app-scraper - move localZoneId to config
+* test ssl and auth for ElasticSearch
 
 ## Future Tasks
 * move form content out of app-ui into a service
