@@ -40,7 +40,7 @@ internal class CalendarEventTest {
         val issues = ScrapeIssues(TEST_EVENT.url, "event source")
         val event = b.build(issues)!!
 
-        assertThat(issues.hasIssues).isFalse()
+        assertThat(issues.hasIssues()).isFalse()
         assertThat(event)
             .usingRecursiveComparison()
             .ignoringFields("timestamp")
@@ -54,10 +54,8 @@ internal class CalendarEventTest {
         val event = CalendarEvent.Builder(TEST_EVENT.url, TEST_EVENT.content).build(issues)
 
         assertThat(event).isNull()
-        assertThat(issues.hasIssues).isTrue()
         assertThat(issues.issues).hasSize(4)
-        val messages = issues.issues.map { it.message }
-        assertThat(messages).containsExactlyInAnyOrder(
+        assertThat(issues.issues).extracting("message").containsExactlyInAnyOrder(
             "could not extract title for event",
             "could not extract description for event",
             "could not extract time for event",

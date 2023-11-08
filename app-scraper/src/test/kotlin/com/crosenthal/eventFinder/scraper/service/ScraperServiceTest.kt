@@ -50,7 +50,7 @@ internal class ScraperServiceTest {
         val calendarEventRepository = mockk<CalendarEventRepository>()
         every { calendarEventService.repository } returns calendarEventRepository
         every { calendarEventRepository.save(event) } returns event
-        every { issues.hasIssues } returns false // *** scrape was successful
+        every { issues.hasIssues() } returns false // *** scrape was successful
         val scrapeIssuesRepository = mockk<ScrapeIssuesRepository>()
         every { scrapeIssuesService.repository } returns scrapeIssuesRepository
         every { issues.url } returns TEST_URL
@@ -63,7 +63,7 @@ internal class ScraperServiceTest {
             eventScraper.scrapeToEvent(doc, TEST_URL)
             calendarEventService.repository
             calendarEventRepository.save(event)
-            issues.hasIssues
+            issues.hasIssues()
             scrapeIssuesService.repository
             issues.url
             scrapeIssuesRepository.deleteById(TEST_URL)
@@ -77,7 +77,7 @@ internal class ScraperServiceTest {
         every { eventScraper.loadDocumentFromUrl(TEST_URL) } returns doc
         val issues = mockk<ScrapeIssues>()
         every { eventScraper.scrapeToEvent(doc, TEST_URL) } returns Pair(null, issues) // *** no event returned due to scrape issues
-        every { issues.hasIssues } returns true // *** there were issues with this scrape
+        every { issues.hasIssues() } returns true // *** there were issues with this scrape
         val scrapeIssuesRepository = mockk<ScrapeIssuesRepository>()
         every { scrapeIssuesService.repository } returns scrapeIssuesRepository
         every { scrapeIssuesRepository.save(issues) } returns issues
@@ -87,7 +87,7 @@ internal class ScraperServiceTest {
         verifySequence {
             eventScraper.loadDocumentFromUrl(TEST_URL)
             eventScraper.scrapeToEvent(doc, TEST_URL)
-            issues.hasIssues
+            issues.hasIssues()
             scrapeIssuesService.repository
             scrapeIssuesRepository.save(issues)
         }

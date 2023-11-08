@@ -23,14 +23,12 @@ data class ScrapeIssues(
     val timestamp : Instant = Instant.now().truncatedTo(ChronoUnit.MILLIS),
 
 ) {
-
-    @Field(type = FieldType.Boolean)
-    var hasIssues: Boolean = false
-        private set
-
     fun add(message: String, resolution: String, node: String? = null) {
         issues.add(ScrapeIssue(message, resolution, node))
-        hasIssues = true
+    }
+
+    fun hasIssues(): Boolean {
+        return issues.isNotEmpty()
     }
 }
 

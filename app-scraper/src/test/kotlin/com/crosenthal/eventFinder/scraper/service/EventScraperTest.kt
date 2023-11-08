@@ -64,7 +64,7 @@ internal class EventScraperTest {
         val doc = scraper.loadDocumentFromStream(openTestDocument(), TEST_URL)
         val (event, issues) = scraper.scrapeToEvent(doc, TEST_URL)
         assertThat(event).isNotNull
-        assertThat(issues.hasIssues).isFalse()
+        assertThat(issues.hasIssues()).isFalse()
         assertThat(event)
             .usingRecursiveComparison()
             .ignoringFields("content", "timestamp")
@@ -76,7 +76,7 @@ internal class EventScraperTest {
         val uri = file.toURI().toString()
         val doc = scraper.loadDocumentFromStream(file.inputStream(), uri)
         val (event, issues) = scraper.scrapeToEvent(doc, uri)
-        assertThat(issues.hasIssues).isFalse()
+        assertThat(issues.hasIssues()).isFalse()
         assertThat(event).isNotNull
     }
 

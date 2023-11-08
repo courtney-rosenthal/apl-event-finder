@@ -42,7 +42,7 @@ class ScraperService(
             calendarEventService.repository.save(event)
         }
 
-        if (issues.hasIssues) {
+        if (issues.hasIssues()) {
             scrapeIssuesService.repository.save(issues)
         } else {
             scrapeIssuesService.repository.deleteById(issues.url)

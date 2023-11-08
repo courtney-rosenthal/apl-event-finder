@@ -263,7 +263,7 @@ class EventScraper(
         eventBuilder.description = unusedNodes.map { it.outerHtml() }.joinToString("\n")
 
         val event =  eventBuilder.build(issues)
-        if (issues.hasIssues) {
+        if (issues.hasIssues()) {
             LOG.warn().log("scrapeToEvent: issues found with document url={}", url)
         }
         return Pair(event, issues)
