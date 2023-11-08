@@ -14,11 +14,10 @@ import org.springframework.context.ApplicationListener
 @SpringBootApplication(scanBasePackages = ["com.crosenthal.eventFinder"])
 open class ScraperApplication(
 	val applicationContext: ApplicationContext,
-	@Qualifier("applicationProperties") val props: ApplicationProperties,
 	val scraperService: ScraperService
 )  : ApplicationListener<ApplicationReadyEvent> {
 	override fun onApplicationEvent(event: ApplicationReadyEvent) {
-		scraperService.performFullSrapeAndSave(props.maxEventsToScrape)
+		scraperService.performFullScrapeAndSave()
 		SpringApplication.exit(applicationContext)
 	}
 }

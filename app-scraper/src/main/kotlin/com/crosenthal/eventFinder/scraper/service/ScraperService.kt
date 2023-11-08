@@ -10,6 +10,7 @@ import org.jsoup.HttpStatusException
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import java.net.URL
+import java.util.stream.Stream
 
 @Service
 class ScraperService(
@@ -49,13 +50,17 @@ class ScraperService(
         LOG.debug().log("scrapeAndSaveOneLink: saved event url={}", url)
     }
 
-    fun performFullSrapeAndSave(maxScrape: Int?) {
-        LOG.info().log("performScrape: starting")
-        eventsFeed.extractLinksFromFeed(URL(config.eventsRss))
-            .take(maxScrape ?: 999)
-            .forEach {
-                scrapeAndSaveOneLink(it)
-            }
+    fun getEventLinks(): Stream<String> {
+        val max = config.maxEventsToScrape
+        LOG.info().log("getEventLinks: retrieving links from ${config.eventsRss} (maxEventsToScrape=${max}")
+        return eventsFeed.extractLinksFromFeed(URL(config.eventsRss)).take(max).stream()
+    }
+
+    fun performFullScrapeAndSave() {
+        LOG.info().log("performFullSrapeAndSave: starting")
+        getEventLinks().forEach {
+            scrapeAndSaveOneLink(it)
+        }
         LOG.info().log("performScrape: finished")
     }
 
