@@ -20,28 +20,15 @@ There are four microservices in this project:
 STATUS: The three listed services currently have MVP implementations.
 See the TODO.md document for short-term development plans.
 
+
 ## Demo Instance
 
 There is a demo instance running at:
 https://courtney-rosenthal.github.io/apl-event-finder/
 
 The demo instance has a Swagger UI for its API here:
-http://apl-event-svc.crosenthal.com:8080/swagger-ui/index.html
+https://apl-event-svc.crosenthal.com/swagger-ui/index.html
 
-### Insecure Content - IMPORTANT!!!
-
-The backend service currently does not have _https_ security implemented, so 
-you will need to adjust your browser to allow "Insecure content" for this site.
-
-Without this, requests to the backend service will be blocked by the browser 
-with a pop-up error.
-
-To work around this with a Google Chrome-based browser:
-  * Browse to the demo site (link above)
-  * Click on the lock (or other icon) next to the URL
-  * Select: Site settings
-  * Scroll down to the "Insecure content" setting
-  * Change it to: Allow
 
 ## Development
 
@@ -107,14 +94,15 @@ To run the front-end UI locally, using the backend service running for the
 demo site, do:
 
     cd app-ui
-    VITE_API_BASE_URL="http://apl-event-svc.crosenthal.com:8080/api" npm run dev
+    VITE_API_BASE_URL="https://apl-event-svc.crosenthal.com/api" npm run dev
 
 The front-end will be available at:
 http://localhost:5173/
 
+
 ## Deployment
 
-*TO DO*
+See [deploy/README.md](deploy/README.md)
 
 
 ## Author
