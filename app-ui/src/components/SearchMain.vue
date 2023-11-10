@@ -87,8 +87,7 @@ const locations = [
   {key: "AUH", label: "University Hills"},
   {key: "AWK", label: "Willie Mae Kirk"},
   {key: "AWP", label: "Windsor Park"},
-  {key: "AYB", label: "Yarborough"},
-  {key: "OTHER", label: "Other Locations"}
+  {key: "AYB", label: "Yarborough"}
 ];
 
 const ages = [
@@ -169,7 +168,7 @@ loadTags();
     </Fieldset>
 
     <Fieldset legend="Age">
-      <i class="pi pi-exclamation-triangle" style="color: black; background: yellow; padding: 3px" title='Warning! The "age" criteria is not fully working.'></i>
+      <i class="pi pi-exclamation-triangle" style="color: black; background: yellow; padding: 3px" title='Warning! The "age" criteria currently is not reliable, due to source data issues.'></i>
       <SelectButton v-model="searchCriteria.age" :options="ages" optionLabel="label" optionValue="key" aria-labelledby="basic" />
 <!--      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('age')" />-->
     </Fieldset>

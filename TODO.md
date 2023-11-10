@@ -1,15 +1,12 @@
 # To Do
 
-## Current Tech Debt
-* implement missing tests
+## New Capabilities -- major things to do next
+* pagination of search results in the UI
+* periodic update of index (and filter past events from results)
+
+## Tech Debt
 * cleanup EventScraper class
 * figure out why Elasticsearch loggers aren't working
-
-## New Capabilities
-* Implement results pagination in the UI
-* Implement periodic update of index (and filter past events from results)
-
-## Backlog Tech Debt
 * implement health check in docker-compose
 * add config to force https (to avoid all the redirections when pulling events)
 * move localZoneId to config
@@ -17,8 +14,9 @@
 * add test coverage report to build
 
 ## Future Tasks
-* move form content out of app-ui into a service
-* app-scraper - add Redis and record scrapes (to track adds/deletes)
+* new UI
+* email notifications based on saved search criteria
+* move search criteria content out of UI app to backend
 
 ## Issues Observed
 
