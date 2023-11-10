@@ -7,8 +7,6 @@
 
 ## New Capabilities
 * Implement results pagination in the UI
-* Put deployment docker-compose into git repo
-* Add traefik to docker-compose and implement SSL
 * Implement periodic update of index (and filter past events from results)
 
 ## Backlog Tech Debt

@@ -1,0 +1,102 @@
+version: '3.9'
+services:
+
+  traefik:
+    image: traefik:v2.5
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./docks/traefik/letsencrypt:/letsencrypt
+    # Enables the web UI and tells Traefik to listen to docker
+    command:
+      #- "--log.level=DEBUG"
+      #- "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
+      - "--certificatesresolvers.resolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.resolver.acme.httpchallenge.entrypoint=http"
+      - "--certificatesresolvers.resolver.acme.email=${CONTACT_EMAIL}"
+      ### Enable for debug cert acquisition
+      ### - "--certificatesresolvers.resolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.resolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - 80:80
+      - 443:443
+        ### # the web UI (enabled by --api.insecure=true)
+        ### - 8080:8080
+    restart: unless-stopped
+
+  elasticsearch:
+    # Spring Data Elasticsearch isn't ready for v8 yet
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+    environment:
+      - network.host=0.0.0.0
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+      ### Normally don't expose the Elasticsearch ports.  This is for debug.
+      ### ports:
+      ###   - 9200:9200
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data/
+    restart: unless-stopped
+
+  app-search-api:
+    image: ghcr.io/courtney-rosenthal/app-search-api:main
+    environment:
+      - APPLICATION_ELASTICSEARCH_SERVER_HOST_AND_PORT=elasticsearch:9200
+      # because we are running behind a revere proxy
+      - SERVER_FORWARD_HEADERS_STRATEGY=NATIVE
+    depends_on:
+      - elasticsearch
+    labels:
+      - "traefik.enable=true"
+      # router to redirect http -> https
+      - "traefik.http.routers.api-http.rule=Host(`${API_HOST}`)"
+      - "traefik.http.routers.api-http.tls=false"
+      - "traefik.http.routers.api-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+      # router to handle https
+      - "traefik.http.routers.api-https.rule=Host(`${API_HOST}`)"
+      - "traefik.http.routers.api-https.tls.certresolver=resolver"
+      - "traefik.http.services.api.loadbalancer.server.port=8080"
+    restart: unless-stopped
+
+  app-scraper:
+    profiles:
+      - scrape
+      - all
+    image: ghcr.io/courtney-rosenthal/app-scraper:main
+    environment:
+      - APPLICATION_ELASTICSEARCH_SERVER_HOST_AND_PORT=elasticsearch:9200
+      ### FIXME - this is temporary, until we have the update service complete
+      ### Default is to scrape 10 events. Enable below only to run full scrape.
+      ### - APPLICATION_MAX_EVENTS_TO_SCRAPE=999
+    depends_on:
+      - elasticsearch
+    restart: no
+
+  # This container provided for test/debug
+  shell:
+    image: debian:stable
+    command: ["/bin/tail", "-f", "/dev/null"]
+    restart: unless-stopped
+
+  # Optional, in case you want to run Kibana
+  kibana:
+    profiles:
+      - kibana
+      - all
+    image: docker.elastic.co/kibana/kibana:7.17.10
+    ports:
+      - 5601:5601
+
+volumes:
+  elasticsearch_data:
+
