@@ -1,10 +1,8 @@
 package com.crosenthal.eventFinder.elasticsearch.service
 
+import com.crosenthal.eventFinder.elasticsearch.ElasticsearchProperties
 import com.crosenthal.eventFinder.elasticsearch.domain.CalendarEvent
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria
-import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.AttendeeAge
-import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Day
-import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Time
 import com.crosenthal.eventFinder.elasticsearch.repository.CalendarEventRepository
 import org.elasticsearch.index.query.BoolQueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
@@ -15,45 +13,28 @@ import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations
+import org.springframework.data.elasticsearch.core.SearchHitSupport
+import org.springframework.data.elasticsearch.core.SearchPage
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder
 import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
 class CalendarEventService(
-    @Qualifier("calendarEventRepository") repository: CalendarEventRepository
+    @Qualifier("calendarEventRepository") repository: CalendarEventRepository,
+    @Qualifier("elasticsearchProperties") val config: ElasticsearchProperties
 ) : BaseService<CalendarEvent, CalendarEventRepository>(repository) {
 
     @Autowired
     lateinit var operations: ElasticsearchOperations
 
-    fun search(
-        days: Set<Day>? = null,
-        times: Set<Time>? = null,
-        locations: Set<String>? = null,
-        age: AttendeeAge? = null,
-        tags: Set<String>? = null,
-        searchText: String? = null
-    ): List<CalendarEvent> {
-        return search(CalendarEventSearchCriteria(
-            days = days,
-            times = times,
-            locations = locations,
-            age = age,
-            tags = tags,
-            searchText = searchText
-        ))
-    }
-
-    // TODO - move this to config
-    val INCLUDE_PAST_EVENTS = true
-
     internal fun newCalendarEventQueryBuilder(): BoolQueryBuilder {
         return QueryBuilders.boolQuery()
             .mustNot(QueryBuilders.termsQuery("isDeleted", true))
             .let {
-                if (INCLUDE_PAST_EVENTS) {
+                if (config.includePastEvents) {
                     it
                 } else {
                     it.must(QueryBuilders.rangeQuery("time.start").gte(Instant.now()))
@@ -61,7 +42,7 @@ class CalendarEventService(
             }
     }
 
-    fun search(criteria: CalendarEventSearchCriteria): List<CalendarEvent> {
+    fun search(criteria: CalendarEventSearchCriteria, pageSize: Int? = null, pageNum: Int? = null): SearchPage<CalendarEvent> {
 
         var query = newCalendarEventQueryBuilder()
 
@@ -110,17 +91,18 @@ class CalendarEventService(
             query = query.must(QueryBuilders.simpleQueryStringQuery(criteria.searchText))
         }
 
-        // TODO: pagination
+        val pageable = Pageable
+            .ofSize(pageSize ?: config.defaultResultsPerPage)
+            .withPage(pageNum ?: 0)
 
         var nativeSearchQuery = NativeSearchQueryBuilder()
             .withQuery(query)
-            // TODO: sort chronological
-            .withPageable(Pageable.ofSize(20))
+            .withSort(Sort.by("time.start").ascending())
+            .withPageable(pageable)
             .build()
 
         val hits = operations.search(nativeSearchQuery, CalendarEvent::class.java)
-
-        return hits.searchHits.map {it.content}
+        return SearchHitSupport.searchPageFor(hits, pageable)
     }
 
     fun listTags(): List<String> {

@@ -5,10 +5,10 @@ import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.AttendeeAge
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Day
 import com.crosenthal.eventFinder.elasticsearch.misc.CalendarEventSearchCriteria.Time
+import com.crosenthal.eventFinder.elasticsearch.misc.SearchPageResponse
 import com.crosenthal.eventFinder.elasticsearch.service.CalendarEventService
 import com.crosenthal.eventFinder.searchApi.exceptions.EntityNotFound
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.responses.ApiResponse
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -36,22 +36,29 @@ class CalendarEventController(
         @RequestParam locations: Set<String>?,
         @RequestParam age: AttendeeAge?,
         @RequestParam tags: Set<String>?,
-        @RequestParam searchText: String?
-    ) : List<CalendarEvent> {
-        return service.search(
+        @RequestParam searchText: String?,
+        @RequestParam pageSize: Int?,
+        @RequestParam pageNum: Int?,
+    ) : SearchPageResponse<CalendarEvent> {
+        val criteria = CalendarEventSearchCriteria(
             days = days,
             times = times,
             locations = locations,
             age = age,
-            tags = tags ?: emptySet(),
-            searchText = searchText ?: ""
+            tags = tags,
+            searchText = searchText
         )
+        return search(criteria, pageSize, pageNum)
     }
 
     @PostMapping("/search")
     @Operation(summary = "Retrieve events based on search criteria, sorted in chronological ascending order")
-    fun search(@RequestBody criteria: CalendarEventSearchCriteria) : List<CalendarEvent> {
-        return service.search(criteria)
+    fun search(
+        @RequestBody criteria: CalendarEventSearchCriteria,
+        @RequestParam pageSize: Int?,
+        @RequestParam pageNum: Int?,
+    ) : SearchPageResponse<CalendarEvent> {
+        return SearchPageResponse.build(service.search(criteria, pageSize, pageNum))
     }
 
 

@@ -108,7 +108,22 @@ const insecureWarning = "\n\nNOTE: At this time the backend runs in 'insecure' m
     "You may be able to fix this error by: " +
     "click the lock in the URL bar -> Site settings -> Insecure content -> Allow.";
 
-function submit() {
+async function performFetch(url, request) {
+  try {
+    const response = await fetch(url, request);
+    if (response.ok) {
+      return response.json();
+    }
+    const error = new Error(response.statusText);
+    error.json = response.json();
+    throw error;
+  } catch (error) {
+    alert("Fetch from backend service failed.\n\nDetail:\n" + error + insecureWarning);
+    throw error;
+  }
+}
+
+async function performSearch() {
   const request = {
     method: "POST",
     body: JSON.stringify(searchCriteria.value),
@@ -116,38 +131,16 @@ function submit() {
       "Content-type": "application/json; charset=UTF-8"
     }
   };
-
-  fetch(BASE_URL + "/calendarEvent/search", request)
-    .then((response) => {
-      if (!response.ok) {
-        const error = new Error(response.statusText);
-        error.json = response.json();
-        throw error;
-      }
-      return response.json()
-    }).then((content) => {
-      searchResults.value = content;
-    }).catch((ex) => {
-      alert("Failed to submit search request to the service.\n\nDetail:\n" + ex + insecureWarning);
-    })
+  const response = await performFetch(BASE_URL + "/calendarEvent/search", request);
+  searchResults.value = response.results;
 }
 
-
-const allTags = ref([])
-fetch(BASE_URL + "/calendarEvent/tags", {method: "GET"})
-  .then((response) => {
-    if (!response.ok) {
-      const error = new Error(response.statusText);
-      error.json = response.json();
-      throw error;
-    }
-    return response.json()
-  }).then((content) => {
-    allTags.value = content;
-  }).catch((ex) => {
-    alert("Failed to retrieve list of tags from the service.\n\nDetail:\n" + ex + insecureWarning);
-  });
-
+const allTags = ref([]);
+async function loadTags() {
+  const response = await performFetch(BASE_URL + "/calendarEvent/tags", {method: "GET"});
+  allTags.value = response;
+}
+loadTags();
 
 </script>
 
@@ -195,7 +188,7 @@ fetch(BASE_URL + "/calendarEvent/tags", {method: "GET"})
     </Fieldset>
 
     <div>
-      <Button label="Search!" @click="submit" />
+      <Button label="Search!" @click="performSearch" />
       <Button class="clear" label="clear all choices" link @click="resetSearchCriteria('all')" />
     </div>
 
