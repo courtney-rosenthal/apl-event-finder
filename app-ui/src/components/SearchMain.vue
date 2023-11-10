@@ -104,9 +104,6 @@ const ages = [
   {key: null, label: "All ages"}
 ];
 
-const insecureWarning = "\n\nNOTE: At this time the backend runs in 'insecure' mode. " +
-    "You may be able to fix this error by: " +
-    "click the lock in the URL bar -> Site settings -> Insecure content -> Allow.";
 
 async function performFetch(url, request) {
   try {
@@ -118,7 +115,7 @@ async function performFetch(url, request) {
     error.json = response.json();
     throw error;
   } catch (error) {
-    alert("Fetch from backend service failed.\n\nDetail:\n" + error + insecureWarning);
+    alert("Fetch from backend service failed.\n\n" + error);
     throw error;
   }
 }
