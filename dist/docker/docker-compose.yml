@@ -1,0 +1,60 @@
+version: '3.9'
+services:
+
+  elasticsearch:
+    # Spring Data Elasticsearch isn't ready for v8 yet
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+    environment:
+      - network.host=0.0.0.0
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+#    ports:
+#      - 9200:9200
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data/
+    restart: unless-stopped
+
+  app-search-api:
+    image: ghcr.io/courtney-rosenthal/app-search-api:main
+    environment:
+      - APPLICATION_ELASTICSEARCH_SERVER_HOST_AND_PORT=elasticsearch:9200
+    ports:
+      - 8080:8080
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  app-scraper:
+    profiles:
+      - scrape
+      - all
+    image: ghcr.io/courtney-rosenthal/app-scraper:main
+    environment:
+      - APPLICATION_ELASTICSEARCH_SERVER_HOST_AND_PORT=elasticsearch:9200
+# Default is to scrape 10 events. Enable below only to run full scrape.
+#      - APPLICATION_MAX_EVENTS_TO_SCRAPE=999
+    depends_on:
+      - elasticsearch
+    restart: no
+
+  shell:
+    image: debian:stable
+    command: ["/bin/tail", "-f", "/dev/null"]
+    restart: unless-stopped
+
+  kibana:
+    profiles:
+      - kibana
+      - all
+    image: docker.elastic.co/kibana/kibana:7.17.10
+    ports:
+      - 5601:5601
+
+volumes:
+  elasticsearch_data:
+
