@@ -9,7 +9,7 @@ import Listbox from 'primevue/listbox';
 import Panel from 'primevue/panel';
 import SelectButton from 'primevue/selectbutton';
 
-import EventCard from './EventCard.vue';
+import SearchResults from './SearchResults.vue';
 
 // Base URL of the backend API
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -33,9 +33,6 @@ async function retrieveFromBackend(url, request) {
   }
 }
 
-// The search results to display.
-const searchResults = ref([])
-
 // The criteria to submit to the search API
 const searchCriteria = ref({
   days: [],
@@ -45,6 +42,9 @@ const searchCriteria = ref({
   tags: [],
   searchText: null
 });
+
+// The search results to display.
+const searchResults = ref({})
 
 /**
  * Action performed when search is requested.
@@ -58,8 +58,9 @@ async function performSearch() {
     }
   };
   const response = await retrieveFromBackend("/calendarEvent/search", request);
-  searchResults.value = response.results;
+  searchResults.value = response;
 }
+
 
 /*
  * Action performed when search criteria reset is requested.
@@ -84,6 +85,7 @@ function resetSearchCriteria(whut) {
     searchCriteria.value.searchText = null;
   }
 }
+
 
 /*
  * On startup retrieve list of tags used.
@@ -207,7 +209,7 @@ const criteriaSelections = {
   </Panel>
 
   <Panel header="Events found ...">
-    <EventCard v-for="item in searchResults" :item="item" />
+    <SearchResults :searchResults="searchResults" />
   </Panel>
 
 </template>

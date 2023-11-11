@@ -6,6 +6,8 @@ data class SearchPageResponse<T>(
     val numResults: Long,
     val numPages: Int,
     val resultsPerPage: Int,
+    val firstResult: Int?,
+    val lastResult: Int?,
     val firstPage: Int,
     val lastPage: Int,
     val currPage: Int,
@@ -18,17 +20,17 @@ data class SearchPageResponse<T>(
         fun <T> build(results: SearchPage<T>): SearchPageResponse<T> {
             val numPages = results.totalPages
             val currPage = results.pageable.pageNumber
+            val resultsPerPage = results.pageable.pageSize
+            val firstResult = if (results.isEmpty) null else currPage * resultsPerPage
+            val lastResult = if (results.isEmpty) null else firstResult!! + results.numberOfElements - 1
             return SearchPageResponse(
                 numResults = results.totalElements,
                 numPages = numPages,
-                resultsPerPage = results.pageable.pageSize,
+                resultsPerPage = resultsPerPage,
+                firstResult = firstResult,
+                lastResult = lastResult,
                 firstPage = 0,
-                lastPage = (numPages-1).let {
-                    if (it < 0)
-                        0
-                    else
-                        it
-                },
+                lastPage = (numPages-1).coerceAtLeast(0),
                 currPage = currPage,
                 prevPage = (currPage-1).let {
                     if (it < 0)
