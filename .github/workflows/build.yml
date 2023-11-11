@@ -40,6 +40,9 @@ jobs:
     - name: Test
       run: ./gradlew check
 
+    - name: Stage Docker build context
+      run: ./gradlew dockerStage
+
     - name: Save test results
       if: success() || failure()
       uses: actions/upload-artifact@v3.1.3
@@ -62,7 +65,12 @@ jobs:
     needs: project-build
     runs-on: ubuntu-latest
     steps:
-
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: Build Artifacts
+    
     - name: Deploy UI to GitHub Pages
       if: github.ref == 'refs/heads/main'
       uses: crazy-max/ghaction-github-pages@v4
@@ -78,10 +86,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-    - name: Stage Docker build context
-      # if: github.ref == 'refs/heads/main'
-      run: ./gradlew dockerStage
-
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: Build Artifacts
+        
     - name: Log in to the container registry
       if: github.ref == 'refs/heads/main'
       uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
