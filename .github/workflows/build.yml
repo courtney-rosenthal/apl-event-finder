@@ -16,10 +16,20 @@ permissions:
 jobs:
 
   project-build:
-
     runs-on: ubuntu-latest
-
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+        env:
+          network.host: 0.0.0.0
+          discovery.type: single-node
+          xpack.security.enabled: false
+          ES_JAVA_OPTS: -Xms1g -Xmx1g
+        ports:
+          - 9200:9200
+      
     steps:
+    
     - uses: actions/checkout@v3
     
     - name: Set up JDK 17
@@ -32,10 +42,10 @@ jobs:
     - name: Build
       run: ./gradlew build -x check
 
-    - name: Bring up test resources via docker-compose
-      uses: isbang/compose-action@v1.5.1
-      with:
-        compose-file: "./.github/docker-compose.yml"
+    # - name: Bring up test resources via docker-compose
+    #   uses: isbang/compose-action@v1.5.1
+    #   with:
+    #     compose-file: "./.github/docker-compose.yml"
 
     - name: Test
       run: ./gradlew check
@@ -62,7 +72,8 @@ jobs:
 
 
   github-pages-build:
-    needs: project-build
+    needs: project-build    
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
     
@@ -72,7 +83,6 @@ jobs:
         name: Build Artifacts
     
     - name: Deploy UI to GitHub Pages
-      if: github.ref == 'refs/heads/main'
       uses: crazy-max/ghaction-github-pages@v4
       with:
         target_branch: gh-pages
@@ -83,6 +93,7 @@ jobs:
 
   docker-build:
     needs: project-build
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
 
@@ -92,7 +103,6 @@ jobs:
         name: Build Artifacts
         
     - name: Log in to the container registry
-      if: github.ref == 'refs/heads/main'
       uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
       with:
         registry: ${{ env.REGISTRY }}
@@ -100,14 +110,12 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Extract metadata (tags, labels) for app-search-api Docker image
-      if: github.ref == 'refs/heads/main'
       id: meta-app-search-api
       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
       with:
         images: ${{ env.REGISTRY }}/${{ github.actor }}/app-search-api
 
     - name: Build and push app-search-api Docker image
-      if: github.ref == 'refs/heads/main'
       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
       with:
         context: app-search-api/build/docker
@@ -116,14 +124,12 @@ jobs:
         labels: ${{ steps.meta-app-search-api.outputs.labels }}
 
     - name: Extract metadata (tags, labels) for app-scraper Docker image
-      if: github.ref == 'refs/heads/main'
       id: meta-app-scraper
       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
       with:
         images: ${{ env.REGISTRY }}/${{ github.actor }}/app-scraper
 
     - name: Build and push app-scraper Docker image
-      if: github.ref == 'refs/heads/main'
       uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
       with:
         context: app-scraper/build/docker
