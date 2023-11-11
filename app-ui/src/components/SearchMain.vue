@@ -65,7 +65,6 @@ function performSearch() {
  * Action performed to paginate through results for current search.
  */
 async function goToResultsPage(pageNum) {
-  console.log("currentSearchCriteria = ", currentSearchCriteria);
   const request = {
     method: "POST",
     body: JSON.stringify(currentSearchCriteria),
