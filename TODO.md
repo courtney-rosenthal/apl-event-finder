@@ -1,7 +1,6 @@
 # To Do
 
 ## New Capabilities -- major things to do next
-* pagination of search results in the UI
 * periodic update of index (and filter past events from results)
 
 ## Tech Debt
@@ -12,8 +11,9 @@
 * move localZoneId to config
 * test ssl and auth for ElasticSearch
 * add test coverage report to build
+* add Watchtower to the docker-compose, to update containers
 
-## Future Tasks
+## Future Capabilities
 * new UI
 * email notifications based on saved search criteria
 * move search criteria content out of UI app to backend
