@@ -33,7 +33,7 @@ async function retrieveFromBackend(url, request) {
   }
 }
 
-// The criteria to submit to the search API
+// The search criteria being selected
 const searchCriteria = ref({
   days: [],
   times: [],
@@ -43,21 +43,37 @@ const searchCriteria = ref({
   searchText: null
 });
 
-// The search results to display.
-const searchResults = ref({})
+// Snapshot of the search criteria, at the time the search is initiated
+// This is done so we can re-use the criteria to paginate through the results
+let currentSearchCriteria = {};
+
+// The results of the most recent search query
+const searchResults = ref({});
 
 /**
  * Action performed when search is requested.
  */
-async function performSearch() {
+function performSearch() {
+  // Snapshot the current search criteria.
+  currentSearchCriteria = { ...searchCriteria.value };
+
+  // Go do a search, with the snapshotted criteria.
+  goToResultsPage(0);
+}
+
+/**
+ * Action performed to paginate through results for current search.
+ */
+async function goToResultsPage(pageNum) {
+  console.log("currentSearchCriteria = ", currentSearchCriteria);
   const request = {
     method: "POST",
-    body: JSON.stringify(searchCriteria.value),
+    body: JSON.stringify(currentSearchCriteria),
     headers: {
       "Content-type": "application/json; charset=UTF-8"
     }
   };
-  const response = await retrieveFromBackend("/calendarEvent/search", request);
+  const response = await retrieveFromBackend(`/calendarEvent/search?pageNum=${pageNum}`, request);
   searchResults.value = response;
 }
 
@@ -202,14 +218,14 @@ const criteriaSelections = {
     </Fieldset>
 
     <div>
-      <Button label="Search!" @click="performSearch" />
+      <Button label="Search!" @click="performSearch()" />
       <Button class="clear" label="clear all choices" link @click="resetSearchCriteria('all')" />
     </div>
 
   </Panel>
 
   <Panel header="Events found ...">
-    <SearchResults :searchResults="searchResults" />
+    <SearchResults :searchResults="searchResults" @go-to-results-page="(n) => goToResultsPage(n)" />
   </Panel>
 
 </template>
