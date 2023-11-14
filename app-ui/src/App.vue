@@ -3,18 +3,18 @@
 </script>
 
 <template>
-  <div>
+  <div class="info-header">
     <h1>Austin Public Library Event Search</h1>
-    <p style="margin-bottom: 10px">
-      This proof of concept demo provides advanced search for the events published at <a href="https://library.austintexas.gov/events">https://library.austintexas.gov/events</a>.
-      It is running on a fixed data snapshot with past events included.
-      The repository for this open source project is <a href="https://github.com/courtney-rosenthal/apl-event-finder">here</a>.
-      Please report any bugs you encounter <a href="https://github.com/courtney-rosenthal/apl-event-finder/issues">here</a>.
-    </p>
+
   </div>
-  <div style="clear: both"></div>
+  <!-- <div style="clear: both"></div> -->
+  <!-- bad idea to use divs like this for formatting. Better to use css. -->
   <SearchMain />
 </template>
 
 <style scoped>
+.info-header {
+  margin-left: 25px;
+  display: block;
+}
 </style>
