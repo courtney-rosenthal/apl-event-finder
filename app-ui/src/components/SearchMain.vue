@@ -175,63 +175,91 @@ const criteriaSelections = {
 </script>
 
 <template>
-  <Panel header="Search for ...">
+  <div class="app-container">
+    <Panel class="filter-panel" header="Search for ...">
 
-    <Fieldset legend="Day">
-      <span v-for="day in criteriaSelections.days" :key="day.key">
-        <Checkbox name="criteria.days" v-model="searchCriteria.days" :inputId="day.key" :value="day.key" /><label :for="day.key">{{ day.label }}</label>
-      </span>
-      <br />
-      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('days')" />
-    </Fieldset>
+      <Fieldset legend="Day" class="custom-fieldset">
+        <span v-for="day in criteriaSelections.days" :key="day.key">
+          <Checkbox name="criteria.days" v-model="searchCriteria.days" :inputId="day.key" :value="day.key" /><label :for="day.key">{{ day.label }}</label>
+        </span>
+        <br />
+        <Button class="clear" label="clear choices" link @click="resetSearchCriteria('days')" />
+      </Fieldset>
 
-    <Fieldset legend="Time">
-      <span v-for="time in criteriaSelections.times" :key="time.key">
-        <Checkbox name="criteria.times" v-model="searchCriteria.times" :inputId="time.key" :value="time.key" /><label :for="time.key">{{ time.label }}</label>
-      </span>
-      <br />
-      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('times')" />
-    </Fieldset>
+      <Fieldset legend="Time">
+        <span v-for="time in criteriaSelections.times" :key="time.key">
+          <Checkbox name="criteria.times" v-model="searchCriteria.times" :inputId="time.key" :value="time.key" /><label :for="time.key">{{ time.label }}</label>
+        </span>
+        <br />
+        <Button class="clear" label="clear choices" link @click="resetSearchCriteria('times')" />
+      </Fieldset>
 
-    <Fieldset legend="Location">
-      <span v-for="location in criteriaSelections.locations" :key="location.key">
-        <Checkbox name="criteria.locations" v-model="searchCriteria.locations" :inputId="location.key" :value="location.key" /><label :for="location.key">{{ location.label }}</label>
-      </span>
-      <br />
-      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('locations')" />
-    </Fieldset>
+      <Fieldset legend="Location">
+        <span v-for="location in criteriaSelections.locations" :key="location.key">
+          <Checkbox name="criteria.locations" v-model="searchCriteria.locations" :inputId="location.key" :value="location.key" /><label :for="location.key">{{ location.label }}</label>
+        </span>
+        <br />
+        <Button class="clear" label="clear choices" link @click="resetSearchCriteria('locations')" />
+      </Fieldset>
 
-    <Fieldset legend="Age">
-      <i class="pi pi-exclamation-triangle" style="color: black; background: yellow; padding: 3px" title='Warning! The "age" criteria currently is not reliable, due to source data issues.'></i>
-      <SelectButton v-model="searchCriteria.age" :options="criteriaSelections.ages" optionLabel="label" optionValue="key" aria-labelledby="basic" />
-<!--      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('age')" />-->
-    </Fieldset>
+      <Fieldset legend="Age">
+        <i class="pi pi-exclamation-triangle" style="color: black; background: yellow; padding: 3px" title='Warning! The "age" criteria currently is not reliable, due to source data issues.'></i>
+        <SelectButton v-model="searchCriteria.age" :options="criteriaSelections.ages" optionLabel="label" optionValue="key" aria-labelledby="basic" />
+  <!--      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('age')" />-->
+      </Fieldset>
 
-    <Fieldset legend="Tags">
-      <Listbox name="criterial.tags" v-model="searchCriteria.tags" :options="allTags" multiple
-               :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:250px" />
-      <Button class="clear" label="clear choices" link @click="resetSearchCriteria('tags')" />
-    </Fieldset>
+      <Fieldset legend="Tags">
+        <Listbox name="criterial.tags" v-model="searchCriteria.tags" :options="allTags" multiple
+                :virtualScrollerOptions="{ itemSize: 38 }" listStyle="height:250px" />
+        <Button class="clear" label="clear choices" link @click="resetSearchCriteria('tags')" />
+      </Fieldset>
 
-    <Fieldset legend="Words or phrases to find">
-      <InputText type="text" v-model="searchCriteria.searchText" />
-    </Fieldset>
+      <Fieldset legend="Words or phrases to find">
+        <InputText type="text" v-model="searchCriteria.searchText" />
+      </Fieldset>
 
-    <div>
-      <Button label="Search!" @click="performSearch()" />
-      <Button class="clear" label="clear all choices" link @click="resetSearchCriteria('all')" />
+      <div>
+        <Button label="Search!" @click="performSearch()" />
+        <Button class="clear" label="clear all choices" link @click="resetSearchCriteria('all')" />
+      </div>
+
+    </Panel>
+
+    <div class="content-panel">
+      <p style="margin-bottom: 10px">
+        This proof of concept demo provides advanced search for the events published at <a href="https://library.austintexas.gov/events">https://library.austintexas.gov/events</a>.
+        It is running on a fixed data snapshot with past events included.
+        The repository for this open source project is <a href="https://github.com/courtney-rosenthal/apl-event-finder">here</a>.
+        Please report any bugs you encounter <a href="https://github.com/courtney-rosenthal/apl-event-finder/issues">here</a>.
+      </p>
+
+      <Panel header="Events found ...">
+      <SearchResults :searchResults="searchResults" @go-to-results-page="(n) => goToResultsPage(n)" />
+      </Panel>
+
     </div>
 
-  </Panel>
-
-  <Panel header="Events found ...">
-    <SearchResults :searchResults="searchResults" @go-to-results-page="(n) => goToResultsPage(n)" />
-  </Panel>
+  </div>
 
 </template>
 
 <style scoped>
-fieldset { display: block; width: 100%; clear: both; }
+fieldset {
+  display: flex;
+  width: 100%;
+  clear: both;
+  margin-top: 15px;
+  margin-bottom: 10px;
+
+}
+
+.content-panel {
+ margin-left: 25px;
+}
+.filter-panel  {
+  max-width: 400px;
+}
+
 fieldset span { white-space: nowrap; }
 label { padding-left: 5px; padding-right: 1.0em; }
 .p-card div.p-card-content { padding: 0;  }  /*this isn't working*/
