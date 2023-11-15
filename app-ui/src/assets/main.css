@@ -1,15 +1,10 @@
 @import './base.css';
 
 #app {
-  /* max-width: 1280px; */
-  /* I recommend against setting max width. Better ways to do this*/
   margin: 0 auto;
-  /* padding: 2rem; */
-
   font-weight: normal;
   display: flex;
   flex-direction: column;
-    /* padding: 0 2rem; */
 }
 
 a,
