@@ -52,7 +52,7 @@ jobs:
     - # Save test results even if the build has failed
       name: Save test results
       if: success() || failure()
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@v4
       with:
         name: Test Results
         path: |
@@ -60,7 +60,7 @@ jobs:
          */build/test-results
         
     - name: Save build artifacts
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@v4
       with:
         name: Build Artifacts
         path: |
@@ -68,7 +68,7 @@ jobs:
           */build/dist
 
     - name: Save Docker contexts
-      uses: actions/upload-artifact@v3.1.3
+      uses: actions/upload-artifact@v4
       with:
         name: Docker Contexts
         path: |
