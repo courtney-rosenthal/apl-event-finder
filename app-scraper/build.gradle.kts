@@ -9,5 +9,5 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
 
 	implementation("rome:rome:1.0") // for RSS feed
-	implementation("org.jsoup:jsoup:1.16.1") // for web scraping
+	implementation("org.jsoup:jsoup:1.21.2") // for web scraping
 }
